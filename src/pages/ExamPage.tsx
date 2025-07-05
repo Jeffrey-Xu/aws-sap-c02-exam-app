@@ -18,6 +18,7 @@ import { useProgressStore } from '../stores/progressStore';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
 import { ROUTES, EXAM_CONFIG } from '../constants';
 import { getRandomQuestions, getQuestionsWithDomainRatio } from '../utils/questionUtils';
+import type { Question } from '../types';
 
 const ExamPage: React.FC = () => {
   const { questions, loading, loadQuestions } = useQuestionStore();

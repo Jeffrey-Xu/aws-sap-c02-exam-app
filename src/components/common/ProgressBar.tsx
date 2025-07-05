@@ -2,7 +2,8 @@ import React from 'react';
 import { clsx } from 'clsx';
 
 interface ProgressBarProps {
-  value: number;
+  value?: number;
+  progress?: number; // Add progress prop for compatibility
   max?: number;
   className?: string;
   showLabel?: boolean;
@@ -12,14 +13,18 @@ interface ProgressBarProps {
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
+  progress, // Accept progress prop
   max = 100,
   className,
   showLabel = true,
   color = 'orange',
   size = 'md'
 }) => {
+  // Use progress if provided, otherwise use value
+  const actualValue = progress !== undefined ? progress : (value || 0);
+  
   // Safe percentage calculation to prevent NaN
-  const safeValue = isFinite(value) ? value : 0;
+  const safeValue = isFinite(actualValue) ? actualValue : 0;
   const safeMax = isFinite(max) && max > 0 ? max : 1;
   const percentage = Math.min(Math.max((safeValue / safeMax) * 100, 0), 100);
   
@@ -41,7 +46,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       {showLabel && (
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-gray-700">
-            {value} / {max}
+            {actualValue} / {max}
           </span>
           <span className="text-sm text-gray-500">
             {Math.round(percentage)}%

@@ -188,7 +188,7 @@ const WeakAreasAnalysis: React.FC<WeakAreasAnalysisProps> = ({
                 </div>
                 <ProgressBar 
                   progress={area.score} 
-                  color={area.priority === 'high' ? 'red' : area.priority === 'medium' ? 'orange' : 'yellow'}
+                  color={area.priority === 'high' ? 'red' : area.priority === 'medium' ? 'orange' : 'green'}
                   size="sm"
                 />
               </div>

@@ -143,7 +143,7 @@ const ExamPreview: React.FC<ExamPreviewProps> = ({
         <div className="mb-6 p-4 bg-yellow-50 rounded-lg">
           <h3 className="font-semibold text-yellow-800 mb-2">📋 Exam Rules & Guidelines</h3>
           <ul className="text-sm text-yellow-700 space-y-1">
-            <li>• You have {EXAM_CONFIG.DURATION_MINUTES} minutes to complete {questions.length} questions</li>
+            <li>• You have {Math.floor(EXAM_CONFIG.FULL_EXAM_DURATION / 60)} minutes to complete {questions.length} questions</li>
             <li>• You can flag questions for review and navigate between questions</li>
             <li>• The exam will auto-submit when time expires</li>
             <li>• You need {EXAM_CONFIG.PASSING_PERCENTAGE}% or higher to pass</li>

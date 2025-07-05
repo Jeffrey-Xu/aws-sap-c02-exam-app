@@ -49,6 +49,12 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress certain warnings during build
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return
+        warn(warning)
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
@@ -59,5 +65,8 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000
+  },
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   }
 })
