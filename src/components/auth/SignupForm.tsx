@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Loader2, CheckCircle, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { validateEmailFormat, validatePassword, getPasswordStrength } from '../../utils/emailValidation';
+import { ROUTES } from '../../constants';
 import Button from '../common/Button';
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
-  onSignupSuccess: (email: string) => void;
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin, onSignupSuccess }) => {
+const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,6 +23,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin, onSignupSucces
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [emailSuggestion, setEmailSuggestion] = useState<string>('');
 
+  const navigate = useNavigate();
   const { signup, isLoading, error, clearError, getUserCount, canRegisterNewUser } = useAuthStore();
 
   const userCount = getUserCount();
@@ -99,7 +101,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin, onSignupSucces
     const result = await signup(formData);
     
     if (result.success) {
-      onSignupSuccess(formData.email);
+      // User is automatically logged in after successful signup
+      navigate(ROUTES.HOME);
     }
   };
 
@@ -370,7 +373,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin, onSignupSucces
                 Creating Account...
               </>
             ) : (
-              'Create Account'
+              'Create Account & Sign In'
             )}
           </Button>
         </form>

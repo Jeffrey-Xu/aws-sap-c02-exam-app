@@ -5,7 +5,7 @@ export interface User {
   lastName: string;
   createdAt: Date;
   lastLoginAt: Date;
-  isEmailVerified: boolean;
+  isEmailVerified: boolean; // Always true in simplified version
   profilePicture?: string;
 }
 
@@ -37,15 +37,8 @@ export interface StoredUser {
   salt: string;
   createdAt: string;
   lastLoginAt: string;
-  isEmailVerified: boolean;
-  verificationToken?: string;
+  isEmailVerified: boolean; // Always true in simplified version
   profilePicture?: string;
-}
-
-export interface EmailVerificationData {
-  email: string;
-  token: string;
-  expiresAt: Date;
 }
 
 export interface AuthError {
@@ -57,7 +50,6 @@ export type AuthAction =
   | 'login'
   | 'signup'
   | 'logout'
-  | 'verify-email'
   | 'forgot-password'
   | 'reset-password';
 
@@ -65,5 +57,4 @@ export interface AuthResult {
   success: boolean;
   user?: User;
   error?: AuthError;
-  requiresVerification?: boolean;
 }

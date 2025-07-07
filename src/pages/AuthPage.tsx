@@ -4,14 +4,12 @@ import { Shield, BookOpen, Users, Award } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
-import EmailVerification from '../components/auth/EmailVerification';
 import { ROUTES } from '../constants';
 
-type AuthMode = 'login' | 'signup' | 'verify-email' | 'forgot-password';
+type AuthMode = 'login' | 'signup' | 'forgot-password';
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
-  const [verificationEmail, setVerificationEmail] = useState('');
   
   const { isAuthenticated, checkSession } = useAuthStore();
 
@@ -27,21 +25,6 @@ const AuthPage: React.FC = () => {
   const handleSwitchToSignup = () => setMode('signup');
   const handleSwitchToLogin = () => setMode('login');
   const handleForgotPassword = () => setMode('forgot-password');
-  
-  const handleSignupSuccess = (email: string) => {
-    setVerificationEmail(email);
-    setMode('verify-email');
-  };
-
-  const handleVerificationSuccess = () => {
-    setMode('login');
-    setVerificationEmail('');
-  };
-
-  const handleBackToLogin = () => {
-    setMode('login');
-    setVerificationEmail('');
-  };
 
   const renderAuthForm = () => {
     switch (mode) {
@@ -49,15 +32,6 @@ const AuthPage: React.FC = () => {
         return (
           <SignupForm
             onSwitchToLogin={handleSwitchToLogin}
-            onSignupSuccess={handleSignupSuccess}
-          />
-        );
-      case 'verify-email':
-        return (
-          <EmailVerification
-            email={verificationEmail}
-            onVerificationSuccess={handleVerificationSuccess}
-            onBackToLogin={handleBackToLogin}
           />
         );
       case 'forgot-password':

@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, AuthState, UserCredentials, SignupData, StoredUser, AuthResult } from '../types/auth';
-import { generateSalt, hashPassword, verifyPassword, generateUserId, generateVerificationToken } from '../utils/crypto';
-import { validateEmailFormat, validatePassword, emailVerificationService } from '../utils/emailValidation';
+import { generateSalt, hashPassword, verifyPassword, generateUserId } from '../utils/crypto';
+import { validateEmailFormat, validatePassword } from '../utils/emailValidation';
 
 const MAX_USERS = 20;
 const USERS_STORAGE_KEY = 'aws_exam_app_users';
@@ -13,8 +13,6 @@ interface AuthStore extends AuthState {
   login: (credentials: UserCredentials) => Promise<AuthResult>;
   signup: (data: SignupData) => Promise<AuthResult>;
   logout: () => void;
-  verifyEmail: (email: string, token: string) => Promise<AuthResult>;
-  resendVerification: (email: string) => Promise<boolean>;
   updateProfile: (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture'>>) => Promise<boolean>;
   deleteAccount: () => Promise<boolean>;
   checkSession: () => void;
@@ -56,7 +54,7 @@ const convertStoredUserToUser = (storedUser: StoredUser): User => ({
   lastName: storedUser.lastName,
   createdAt: new Date(storedUser.createdAt),
   lastLoginAt: new Date(storedUser.lastLoginAt),
-  isEmailVerified: storedUser.isEmailVerified,
+  isEmailVerified: true, // Always true since we removed verification
   profilePicture: storedUser.profilePicture
 });
 
@@ -95,13 +93,6 @@ export const useAuthStore = create<AuthStore>()(
             const error = { code: 'INVALID_PASSWORD', message: 'Incorrect password' };
             set({ error: error.message, isLoading: false });
             return { success: false, error };
-          }
-
-          // Check email verification
-          if (!storedUser.isEmailVerified) {
-            const error = { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email address before logging in' };
-            set({ error: error.message, isLoading: false });
-            return { success: false, error, requiresVerification: true };
           }
 
           // Update last login
@@ -182,7 +173,6 @@ export const useAuthStore = create<AuthStore>()(
           // Create user
           const salt = await generateSalt();
           const passwordHash = await hashPassword(data.password, salt);
-          const verificationToken = generateVerificationToken();
           const userId = generateUserId();
           const now = new Date().toISOString();
 
@@ -195,18 +185,19 @@ export const useAuthStore = create<AuthStore>()(
             salt,
             createdAt: now,
             lastLoginAt: now,
-            isEmailVerified: false,
-            verificationToken
+            isEmailVerified: true // Always true since we removed verification
           };
 
           // Save user
           const updatedUsers = [...currentUsers, newStoredUser];
           saveStoredUsers(updatedUsers);
 
-          // Send verification email
-          await emailVerificationService.sendVerificationEmail(data.email, verificationToken);
+          // Create user session immediately (no email verification needed)
+          const user = convertStoredUserToUser(newStoredUser);
 
           set({
+            user,
+            isAuthenticated: true,
             isLoading: false,
             error: null,
             registrationCount: updatedUsers.length
@@ -214,80 +205,12 @@ export const useAuthStore = create<AuthStore>()(
 
           return { 
             success: true, 
-            requiresVerification: true,
-            user: convertStoredUserToUser(newStoredUser)
+            user
           };
         } catch (error) {
           const authError = { code: 'SIGNUP_ERROR', message: 'An error occurred during registration' };
           set({ error: authError.message, isLoading: false });
           return { success: false, error: authError };
-        }
-      },
-
-      verifyEmail: async (email: string, token: string): Promise<AuthResult> => {
-        set({ isLoading: true, error: null });
-
-        try {
-          // Verify token with email service
-          const isValidToken = await emailVerificationService.verifyEmailToken(email, token);
-          if (!isValidToken) {
-            const error = { code: 'INVALID_TOKEN', message: 'Invalid or expired verification token' };
-            set({ error: error.message, isLoading: false });
-            return { success: false, error };
-          }
-
-          // Update user verification status
-          const users = getStoredUsers();
-          const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-          
-          if (userIndex === -1) {
-            const error = { code: 'USER_NOT_FOUND', message: 'User not found' };
-            set({ error: error.message, isLoading: false });
-            return { success: false, error };
-          }
-
-          users[userIndex].isEmailVerified = true;
-          delete users[userIndex].verificationToken;
-          saveStoredUsers(users);
-
-          const user = convertStoredUserToUser(users[userIndex]);
-
-          set({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          });
-
-          return { success: true, user };
-        } catch (error) {
-          const authError = { code: 'VERIFICATION_ERROR', message: 'An error occurred during email verification' };
-          set({ error: authError.message, isLoading: false });
-          return { success: false, error: authError };
-        }
-      },
-
-      resendVerification: async (email: string): Promise<boolean> => {
-        try {
-          const storedUser = findUserByEmail(email);
-          if (!storedUser || storedUser.isEmailVerified) {
-            return false;
-          }
-
-          const newToken = generateVerificationToken();
-          
-          // Update user with new token
-          const users = getStoredUsers();
-          const userIndex = users.findIndex(u => u.id === storedUser.id);
-          if (userIndex !== -1) {
-            users[userIndex].verificationToken = newToken;
-            saveStoredUsers(users);
-          }
-
-          await emailVerificationService.sendVerificationEmail(email, newToken);
-          return true;
-        } catch {
-          return false;
         }
       },
 
@@ -356,9 +279,9 @@ export const useAuthStore = create<AuthStore>()(
       checkSession: () => {
         const { user } = get();
         if (user) {
-          // Verify user still exists and is verified
+          // Verify user still exists
           const storedUser = findUserById(user.id);
-          if (!storedUser || !storedUser.isEmailVerified) {
+          if (!storedUser) {
             set({
               user: null,
               isAuthenticated: false,

@@ -27,11 +27,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if email is verified
-  if (!user.isEmailVerified) {
-    return <Navigate to="/auth" replace />;
-  }
-
+  // No email verification check needed - user is authenticated and ready to go
   return <>{children}</>;
 };
 
