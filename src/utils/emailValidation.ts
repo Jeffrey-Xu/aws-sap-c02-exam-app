@@ -121,16 +121,24 @@ export const emailVerificationService: EmailVerificationService = {
   async sendVerificationEmail(email: string, token: string): Promise<boolean> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    console.log(`📧 Verification email sent to ${email}`);
-    console.log(`🔗 Verification link: ${window.location.origin}/verify-email?token=${token}&email=${encodeURIComponent(email)}`);
+    const verificationLink = `${window.location.origin}/auth?token=${token}&email=${encodeURIComponent(email)}`;
     
+    console.log(`📧 Verification email sent to ${email}`);
+    console.log(`🔗 Verification link: ${verificationLink}`);
+    
+    // Store verification data in localStorage for simulation
     const verificationData = {
       email,
       token,
+      verificationLink,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     };
     
     localStorage.setItem(`email_verification_${email}`, JSON.stringify(verificationData));
+    
+    // Also store the link for easy access
+    localStorage.setItem(`verification_link_${email}`, verificationLink);
+    
     return true;
   },
   

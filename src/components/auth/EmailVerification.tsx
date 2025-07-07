@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, CheckCircle, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Mail, CheckCircle, AlertCircle, Loader2, RefreshCw, ExternalLink, Copy } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import Button from '../common/Button';
 
@@ -18,8 +18,17 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [verificationLink, setVerificationLink] = useState<string>('');
 
   const { verifyEmail, resendVerification, isLoading, error, clearError } = useAuthStore();
+
+  // Load verification link from localStorage
+  useEffect(() => {
+    const storedLink = localStorage.getItem(`verification_link_${email}`);
+    if (storedLink) {
+      setVerificationLink(storedLink);
+    }
+  }, [email]);
 
   // Handle URL parameters for email verification
   useEffect(() => {
@@ -70,8 +79,14 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     const success = await resendVerification(email);
     
     if (success) {
-      setMessage({ type: 'success', text: 'Verification email sent! Please check your inbox.' });
+      setMessage({ type: 'success', text: 'Verification email sent! Check the verification link below.' });
       setResendCooldown(60); // 60 second cooldown
+      
+      // Update verification link
+      const newLink = localStorage.getItem(`verification_link_${email}`);
+      if (newLink) {
+        setVerificationLink(newLink);
+      }
     } else {
       setMessage({ type: 'error', text: 'Failed to send verification email. Please try again.' });
     }
@@ -82,6 +97,19 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleVerification();
+  };
+
+  const copyVerificationLink = () => {
+    if (verificationLink) {
+      navigator.clipboard.writeText(verificationLink);
+      setMessage({ type: 'success', text: 'Verification link copied to clipboard!' });
+    }
+  };
+
+  const openVerificationLink = () => {
+    if (verificationLink) {
+      window.location.href = verificationLink;
+    }
   };
 
   return (
@@ -104,12 +132,40 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             <div className="text-sm text-blue-700">
               <p className="font-medium mb-2">To verify your email:</p>
               <ol className="list-decimal list-inside space-y-1">
-                <li>Check your email inbox (and spam folder)</li>
-                <li>Click the verification link in the email</li>
-                <li>Or copy and paste the verification code below</li>
+                <li>Click the verification link below</li>
+                <li>Or copy and paste the verification code manually</li>
+                <li>Or check your browser console for the verification URL</li>
               </ol>
             </div>
           </div>
+
+          {/* Direct Verification Link */}
+          {verificationLink && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div className="text-sm text-green-700 mb-3">
+                <p className="font-medium">🔗 Direct Verification Link:</p>
+                <p className="text-xs text-green-600 mt-1">Click the link below to verify your email instantly</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  onClick={openVerificationLink}
+                  className="flex-1 flex items-center justify-center"
+                  size="sm"
+                >
+                  <ExternalLink size={16} className="mr-2" />
+                  Verify Email Now
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={copyVerificationLink}
+                  size="sm"
+                  className="flex items-center"
+                >
+                  <Copy size={16} />
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Manual Verification Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
