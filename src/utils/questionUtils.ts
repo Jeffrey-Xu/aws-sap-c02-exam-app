@@ -19,7 +19,7 @@ export function safeNumber(value: any, defaultValue: number = 0): number {
 export function categorizeQuestion(question: Question): ExamDomain {
   // Map data categories to proper ExamDomains
   if (question.category) {
-    switch (question.category) {
+    switch (question.category as string) {
       case 'design-solutions':
         // Distribute design-solutions questions across domains based on content
         return categorizeDesignSolutionQuestion(question);
@@ -67,7 +67,6 @@ function categorizeDesignSolutionQuestion(question: Question): ExamDomain {
   return 'new-solutions';
 }
 
-function categorizeByContent(question: Question): ExamDomain {
 function categorizeByContent(question: Question): ExamDomain {
   const questionText = question.question.toLowerCase();
   const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
@@ -229,7 +228,7 @@ export function validateQuestion(question: Question): string[] {
   
   // Check if correct answer references valid options
   const correctAnswers = parseCorrectAnswers(question.correct_answer);
-  const availableOptions = question.options.map(opt => opt.letter);
+  const availableOptions = question.options.map(opt => opt.letter as string);
   
   correctAnswers.forEach(answer => {
     if (!availableOptions.includes(answer)) {
