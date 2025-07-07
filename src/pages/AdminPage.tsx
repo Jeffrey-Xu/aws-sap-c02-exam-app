@@ -20,8 +20,6 @@ interface UserMetrics {
 }
 
 const AdminPage: React.FC = () => {
-  console.log('AdminPage component loaded at:', window.location.pathname); // Debug log
-  
   // Route verification
   if (window.location.pathname !== '/admin') {
     console.error('AdminPage loaded but pathname is not /admin:', window.location.pathname);
@@ -39,7 +37,6 @@ const AdminPage: React.FC = () => {
 
   // Check if already authenticated on mount
   useEffect(() => {
-    console.log('AdminPage useEffect triggered, pathname:', window.location.pathname); // Debug log
     const adminAuth = localStorage.getItem('admin_authenticated');
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
@@ -73,27 +70,15 @@ const AdminPage: React.FC = () => {
     try {
       const userData: UserMetrics[] = [];
       
-      // Debug: Log all localStorage keys
-      console.log('All localStorage keys:');
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        console.log(`  ${i}: ${key}`);
-      }
-      
       // Get real user data from auth store
       const usersData = localStorage.getItem('aws_exam_app_users');
       const users = usersData ? JSON.parse(usersData) : [];
-      
-      console.log('Found users in storage:', users.length); // Debug log
-      console.log('Users data:', users); // Debug log
       
       users.forEach((user: any) => {
         try {
           // Get progress data for this user
           const progressKey = `progress-store-${user.id}`;
           const progressData = JSON.parse(localStorage.getItem(progressKey) || '{}');
-          
-          console.log(`User ${user.id} (${user.email}) progress:`, progressData); // Debug log
           
           // Calculate metrics from progress data
           const totalQuestions = progressData.totalQuestions || 0;
@@ -139,7 +124,6 @@ const AdminPage: React.FC = () => {
         }
       });
       
-      console.log('Final processed user data:', userData); // Debug log
       setUsers(userData);
     } catch (err) {
       setError('Failed to load user data');
