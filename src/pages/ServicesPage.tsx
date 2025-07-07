@@ -1,12 +1,17 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronRight, ChevronDown, Cloud, Database, Shield, Cpu, Network, Globe } from 'lucide-react';
+import { Search, ChevronRight, ChevronDown, Cloud, Database, Shield, Cpu, Network, Globe, Users, Lightbulb, Settings, BookOpen, Award } from 'lucide-react';
 import Card from '../components/common/Card';
 import { awsServicesData } from '../data/awsServices';
+import { architectGuideData } from '../data/architectGuide';
+
+type ContentType = 'services' | 'architect';
 
 const ServicesPage: React.FC = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedGuideItem, setSelectedGuideItem] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['compute']));
+  const [contentType, setContentType] = useState<ContentType>('services');
 
   const filteredServices = useMemo(() => {
     if (!searchTerm) return awsServicesData;
@@ -25,6 +30,23 @@ const ServicesPage: React.FC = () => {
     return filtered;
   }, [searchTerm]);
 
+  const filteredGuideData = useMemo(() => {
+    if (!searchTerm) return architectGuideData;
+    
+    const filtered: typeof architectGuideData = {};
+    Object.entries(architectGuideData).forEach(([category, items]) => {
+      const matchingItems = items.filter(item =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.content.keyPoints.some(point => point.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      if (matchingItems.length > 0) {
+        filtered[category] = matchingItems;
+      }
+    });
+    return filtered;
+  }, [searchTerm]);
+
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(category)) {
@@ -35,7 +57,7 @@ const ServicesPage: React.FC = () => {
     setExpandedCategories(newExpanded);
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getServiceCategoryIcon = (category: string) => {
     const icons: Record<string, React.ReactNode> = {
       compute: <Cpu className="w-4 h-4" />,
       storage: <Database className="w-4 h-4" />,
@@ -51,250 +73,432 @@ const ServicesPage: React.FC = () => {
     return icons[category] || <Cloud className="w-4 h-4" />;
   };
 
-  const selectedServiceData = useMemo(() => {
-    if (!selectedService) return null;
-    for (const services of Object.values(filteredServices)) {
-      const service = services.find(s => s.id === selectedService);
-      if (service) return service;
-    }
-    return null;
-  }, [selectedService, filteredServices]);
+  const getGuideCategoryIcon = (category: string) => {
+    const icons: Record<string, React.ReactNode> = {
+      'core-competencies': <Users className="w-4 h-4" />,
+      'methodologies': <Lightbulb className="w-4 h-4" />,
+      'tools-technologies': <Settings className="w-4 h-4" />,
+      'domain-expertise': <BookOpen className="w-4 h-4" />,
+      'career-development': <Award className="w-4 h-4" />
+    };
+    return icons[category] || <BookOpen className="w-4 h-4" />;
+  };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">AWS Reference Guide</h1>
-              <p className="mt-2 text-gray-600">Comprehensive AWS services reference with multi-cloud comparisons for SAP-C02 exam preparation</p>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <Cloud className="w-4 h-4" />
-              <span>{Object.values(filteredServices).reduce((acc, services) => acc + services.length, 0)} Services</span>
-            </div>
-          </div>
+  const getServiceCategoryTitle = (category: string) => {
+    const titles: Record<string, string> = {
+      compute: 'Compute Services',
+      storage: 'Storage Services',
+      database: 'Database Services',
+      networking: 'Networking & Content Delivery',
+      security: 'Security, Identity & Compliance',
+      analytics: 'Analytics',
+      'machine-learning': 'Machine Learning',
+      'developer-tools': 'Developer Tools',
+      management: 'Management & Governance',
+      integration: 'Application Integration'
+    };
+    return titles[category] || category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  const getGuideCategoryTitle = (category: string) => {
+    const titles: Record<string, string> = {
+      'core-competencies': 'Core Competencies',
+      'methodologies': 'Methodologies & Frameworks',
+      'tools-technologies': 'Tools & Technologies',
+      'domain-expertise': 'Domain Expertise',
+      'career-development': 'Career Development'
+    };
+    return titles[category] || category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  const renderServicesContent = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Services List */}
+      <div className="lg:col-span-1">
+        <div className="space-y-4">
+          {Object.entries(filteredServices).map(([category, services]) => (
+            <Card key={category} className="p-0">
+              <button
+                onClick={() => toggleCategory(category)}
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
+              >
+                <div className="flex items-center space-x-3">
+                  {getServiceCategoryIcon(category)}
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      {getServiceCategoryTitle(category)}
+                    </h3>
+                    <p className="text-sm text-gray-500">{services.length} services</p>
+                  </div>
+                </div>
+                {expandedCategories.has(category) ? (
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
+              
+              {expandedCategories.has(category) && (
+                <div className="border-t border-gray-200">
+                  {services.map((service) => (
+                    <button
+                      key={service.id}
+                      onClick={() => setSelectedService(service.id)}
+                      className={`w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
+                        selectedService === service.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{service.name}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                          <div className="flex items-center mt-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              service.tier === 'core' ? 'bg-red-100 text-red-800' :
+                              service.tier === 'important' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {service.tier}
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </Card>
+          ))}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-6 h-[calc(100vh-200px)]">
-          {/* Left Panel - Services Tree */}
-          <div className="w-1/3 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
-            {/* Search */}
-            <div className="p-4 border-b border-gray-200">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search AWS services and features..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-            </div>
+      {/* Service Details */}
+      <div className="lg:col-span-2">
+        {selectedService ? (
+          <Card className="p-6">
+            {(() => {
+              const service = Object.values(filteredServices)
+                .flat()
+                .find(s => s.id === selectedService);
+              
+              if (!service) return <div>Service not found</div>;
 
-            {/* Services Tree */}
-            <div className="flex-1 overflow-y-auto">
-              {Object.entries(filteredServices).map(([category, services]) => (
-                <div key={category} className="border-b border-gray-100 last:border-b-0">
-                  <button
-                    onClick={() => toggleCategory(category)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 text-left"
-                  >
-                    <div className="flex items-center space-x-2">
-                      {getCategoryIcon(category)}
-                      <span className="font-medium text-gray-900 capitalize">
-                        {category.replace('-', ' ')}
-                      </span>
-                      <span className="text-xs text-gray-500">({services.length})</span>
-                    </div>
-                    {expandedCategories.has(category) ? (
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                    )}
-                  </button>
-                  
-                  {expandedCategories.has(category) && (
-                    <div className="bg-gray-50">
-                      {services.map((service) => (
-                        <button
-                          key={service.id}
-                          onClick={() => setSelectedService(service.id)}
-                          className={`w-full text-left px-6 py-2 hover:bg-gray-100 border-l-2 transition-colors ${
-                            selectedService === service.id
-                              ? 'border-orange-500 bg-orange-50 text-orange-900'
-                              : 'border-transparent text-gray-700'
-                          }`}
-                        >
-                          <div className="font-medium">{service.name}</div>
-                          <div className="text-xs text-gray-500 truncate">{service.description}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Panel - Service Details */}
-          <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200">
-            {selectedServiceData ? (
-              <div className="h-full overflow-y-auto">
-                {/* Service Header */}
-                <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-orange-100">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{selectedServiceData.name}</h2>
-                      <p className="mt-2 text-gray-600">{selectedServiceData.description}</p>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedServiceData.tier === 'core' ? 'bg-red-100 text-red-800' :
-                        selectedServiceData.tier === 'important' ? 'bg-orange-100 text-orange-800' :
-                        'bg-blue-100 text-blue-800'
+              return (
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-2xl font-bold text-gray-900">{service.name}</h2>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        service.tier === 'core' ? 'bg-red-100 text-red-800' :
+                        service.tier === 'important' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
                       }`}>
-                        {selectedServiceData.tier?.toUpperCase()} SERVICE
+                        {service.tier} service
                       </span>
                     </div>
+                    <p className="text-gray-600">{service.description}</p>
                   </div>
-                </div>
 
-                <div className="p-6 space-y-6">
-                  {/* Key Features */}
-                  <Card>
+                  <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
                     <ul className="space-y-2">
-                      {selectedServiceData.keyFeatures.map((feature, index) => (
-                        <li key={index} className="flex items-start space-x-2">
-                          <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                      {service.keyFeatures.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                           <span className="text-gray-700">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                  </Card>
+                  </div>
 
-                  {/* Use Cases */}
-                  <Card>
+                  <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Common Use Cases</h3>
                     <ul className="space-y-2">
-                      {selectedServiceData.useCases.map((useCase, index) => (
-                        <li key={index} className="flex items-start space-x-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                      {service.useCases.map((useCase, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                           <span className="text-gray-700">{useCase}</span>
                         </li>
                       ))}
                     </ul>
-                  </Card>
+                  </div>
 
-                  {/* Pricing Model */}
-                  <Card>
+                  <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Pricing Model</h3>
-                    <p className="text-gray-700">{selectedServiceData.pricingModel}</p>
-                  </Card>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{service.pricingModel}</p>
+                  </div>
 
-                  {/* Integration Points */}
-                  {selectedServiceData.integrations && selectedServiceData.integrations.length > 0 && (
-                    <Card>
+                  {service.examTips && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">SAP-C02 Exam Tips</h3>
+                      <ul className="space-y-2">
+                        {service.examTips.map((tip, index) => (
+                          <li key={index} className="flex items-start">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                            <span className="text-gray-700">{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {service.integrations && (
+                    <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">Key Integrations</h3>
                       <div className="flex flex-wrap gap-2">
-                        {selectedServiceData.integrations.map((integration, index) => (
+                        {service.integrations.map((integration, index) => (
                           <span
                             key={index}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
                           >
                             {integration}
                           </span>
                         ))}
                       </div>
-                    </Card>
-                  )}
-
-                  {/* Exam Tips */}
-                  {selectedServiceData.examTips && selectedServiceData.examTips.length > 0 && (
-                    <Card className="bg-yellow-50 border-yellow-200">
-                      <h3 className="text-lg font-semibold text-yellow-900 mb-3">💡 SAP-C02 Exam Tips</h3>
-                      <ul className="space-y-2">
-                        {selectedServiceData.examTips.map((tip, index) => (
-                          <li key={index} className="flex items-start space-x-2">
-                            <div className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-yellow-800">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </Card>
-                  )}
-
-                  {/* Limits and Quotas */}
-                  {selectedServiceData.limits && selectedServiceData.limits.length > 0 && (
-                    <Card>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Service Limits & Quotas</h3>
-                      <ul className="space-y-2">
-                        {selectedServiceData.limits.map((limit, index) => (
-                          <li key={index} className="flex items-start space-x-2">
-                            <div className="w-1.5 h-1.5 bg-gray-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-700">{limit}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </Card>
-                  )}
-
-                  {/* Cloud Provider Comparisons */}
-                  {selectedServiceData.cloudComparisons && (
-                    <Card className="bg-blue-50 border-blue-200">
-                      <h3 className="text-lg font-semibold text-blue-900 mb-3">🌐 Equivalent Services in Other Clouds</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {selectedServiceData.cloudComparisons.googleCloud && (
-                          <div className="bg-white rounded-lg p-3 border border-blue-100">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                              <span className="font-medium text-gray-900">Google Cloud</span>
-                            </div>
-                            <p className="text-sm text-gray-700">{selectedServiceData.cloudComparisons.googleCloud}</p>
-                          </div>
-                        )}
-                        {selectedServiceData.cloudComparisons.azure && (
-                          <div className="bg-white rounded-lg p-3 border border-blue-100">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
-                              <span className="font-medium text-gray-900">Microsoft Azure</span>
-                            </div>
-                            <p className="text-sm text-gray-700">{selectedServiceData.cloudComparisons.azure}</p>
-                          </div>
-                        )}
-                        {selectedServiceData.cloudComparisons.alibabaCloud && (
-                          <div className="bg-white rounded-lg p-3 border border-blue-100">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
-                              <span className="font-medium text-gray-900">Alibaba Cloud</span>
-                            </div>
-                            <p className="text-sm text-gray-700">{selectedServiceData.cloudComparisons.alibabaCloud}</p>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3 text-xs text-blue-700">
-                        💡 Understanding equivalent services helps with multi-cloud strategies and cloud migration scenarios
-                      </div>
-                    </Card>
+                    </div>
                   )}
                 </div>
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select an AWS Service</h3>
-                  <p className="text-gray-600">Choose a service from the left panel to view detailed reference information</p>
+              );
+            })()}
+          </Card>
+        ) : (
+          <Card className="p-8 text-center">
+            <Cloud className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Select an AWS Service</h3>
+            <p className="text-gray-600">
+              Choose a service from the left panel to view detailed information, features, and exam tips.
+            </p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderArchitectContent = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Guide List */}
+      <div className="lg:col-span-1">
+        <div className="space-y-4">
+          {Object.entries(filteredGuideData).map(([category, items]) => (
+            <Card key={category} className="p-0">
+              <button
+                onClick={() => toggleCategory(category)}
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
+              >
+                <div className="flex items-center space-x-3">
+                  {getGuideCategoryIcon(category)}
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      {getGuideCategoryTitle(category)}
+                    </h3>
+                    <p className="text-sm text-gray-500">{items.length} topics</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+                {expandedCategories.has(category) ? (
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
+              
+              {expandedCategories.has(category) && (
+                <div className="border-t border-gray-200">
+                  {items.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedGuideItem(item.id)}
+                      className={`w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
+                        selectedGuideItem === item.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{item.title}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                          <div className="flex items-center mt-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.priority === 'essential' ? 'bg-red-100 text-red-800' :
+                              item.priority === 'important' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {item.priority}
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </Card>
+          ))}
         </div>
       </div>
+
+      {/* Guide Details */}
+      <div className="lg:col-span-2">
+        {selectedGuideItem ? (
+          <Card className="p-6">
+            {(() => {
+              const item = Object.values(filteredGuideData)
+                .flat()
+                .find(i => i.id === selectedGuideItem);
+              
+              if (!item) return <div>Guide item not found</div>;
+
+              return (
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-2xl font-bold text-gray-900">{item.title}</h2>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        item.priority === 'essential' ? 'bg-red-100 text-red-800' :
+                        item.priority === 'important' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {item.priority}
+                      </span>
+                    </div>
+                    <p className="text-gray-600">{item.description}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Overview</h3>
+                    <p className="text-gray-700 bg-gray-50 p-4 rounded-lg">{item.content.overview}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Key Points</h3>
+                    <ul className="space-y-2">
+                      {item.content.keyPoints.map((point, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                          <span className="text-gray-700">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Practical Tips</h3>
+                    <ul className="space-y-2">
+                      {item.content.practicalTips.map((tip, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                          <span className="text-gray-700">{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {item.content.tools && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Recommended Tools</h3>
+                      <ul className="space-y-2">
+                        {item.content.tools.map((tool, index) => (
+                          <li key={index} className="flex items-start">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                            <span className="text-gray-700">{tool}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {item.content.checklist && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Checklist</h3>
+                      <ul className="space-y-2">
+                        {item.content.checklist.map((checkItem, index) => (
+                          <li key={index} className="flex items-start">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                            <span className="text-gray-700">{checkItem}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </Card>
+        ) : (
+          <Card className="p-8 text-center">
+            <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Guide Topic</h3>
+            <p className="text-gray-600">
+              Choose a topic from the left panel to view detailed guidance and best practices.
+            </p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">AWS Services & Architecture Guide</h1>
+          <p className="text-gray-600 mt-1">
+            Comprehensive reference for AWS services and solution architecture best practices
+          </p>
+        </div>
+      </div>
+
+      {/* Content Type Toggle */}
+      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+        <button
+          onClick={() => {
+            setContentType('services');
+            setSelectedService(null);
+            setSelectedGuideItem(null);
+            setExpandedCategories(new Set(['compute']));
+          }}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            contentType === 'services'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Cloud className="w-4 h-4 inline mr-2" />
+          AWS Services
+        </button>
+        <button
+          onClick={() => {
+            setContentType('architect');
+            setSelectedService(null);
+            setSelectedGuideItem(null);
+            setExpandedCategories(new Set(['core-competencies']));
+          }}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            contentType === 'architect'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Users className="w-4 h-4 inline mr-2" />
+          Architecture Guide
+        </button>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <input
+          type="text"
+          placeholder={`Search ${contentType === 'services' ? 'AWS services' : 'architecture topics'}...`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      {/* Content */}
+      {contentType === 'services' ? renderServicesContent() : renderArchitectContent()}
     </div>
   );
 };

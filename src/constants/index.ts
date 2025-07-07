@@ -41,7 +41,6 @@ export const ROUTES = {
   EXAM: '/exam',
   ANALYTICS: '/analytics',
   SERVICES: '/services',
-  ARCHITECT: '/architect',
   SETTINGS: '/settings',
 } as const;
 

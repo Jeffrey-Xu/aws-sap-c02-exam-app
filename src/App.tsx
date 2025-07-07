@@ -14,7 +14,6 @@ const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ExamPage = lazy(() => import('./pages/ExamPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
-const ArchitectGuidePage = lazy(() => import('./pages/ArchitectGuidePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 // Loading component
@@ -95,14 +94,6 @@ function App() {
           <ProtectedLayout>
             <Suspense fallback={<LoadingSpinner />}>
               <ServicesPage />
-            </Suspense>
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/architect" element={
-          <ProtectedLayout>
-            <Suspense fallback={<LoadingSpinner />}>
-              <ArchitectGuidePage />
             </Suspense>
           </ProtectedLayout>
         } />
