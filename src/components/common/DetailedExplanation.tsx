@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, CheckCircle, XCircle, Lightbulb, Cloud, BookOpen } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle, XCircle, BookOpen } from 'lucide-react';
 import type { Question } from '../../types';
 
 interface DetailedExplanationProps {
@@ -9,9 +9,7 @@ interface DetailedExplanationProps {
 
 const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, userAnswer }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    optionAnalysis: true, // Make this expanded by default since Overview is removed
-    keyInsights: false,
-    awsServices: false
+    optionAnalysis: true // Make this expanded by default since Overview is removed
   });
 
   const toggleSection = (section: string) => {
@@ -125,117 +123,6 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
     );
   };
 
-  const renderKeyInsights = () => {
-    const reasoning = question.detailed_reasoning;
-    if (!reasoning) return <p className="text-gray-500">No key insights available.</p>;
-
-    return (
-      <div className="space-y-4">
-        {(reasoning.why_correct_answer_wins?.length || 0) > 0 && (
-          <div>
-            <h4 className="font-medium text-green-700 mb-2 flex items-center">
-              <CheckCircle size={16} className="mr-2" />
-              Why the Correct Answer Wins
-            </h4>
-            <ul className="space-y-1">
-              {(reasoning.why_correct_answer_wins || []).map((insight, index) => (
-                <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
-                  <span className="text-green-500 mr-2 mt-1">•</span>
-                  {insight}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {(reasoning.common_mistakes?.length || 0) > 0 && (
-          <div>
-            <h4 className="font-medium text-red-700 mb-2 flex items-center">
-              <XCircle size={16} className="mr-2" />
-              Common Mistakes to Avoid
-            </h4>
-            <ul className="space-y-1">
-              {(reasoning.common_mistakes || []).map((mistake, index) => (
-                <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
-                  <span className="text-red-500 mr-2 mt-1">•</span>
-                  {mistake}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {reasoning.summary_reasoning?.key_decision_factors && (
-          <div>
-            <h4 className="font-medium text-blue-700 mb-2 flex items-center">
-              <Lightbulb size={16} className="mr-2" />
-              Key Decision Factors
-            </h4>
-            <ul className="space-y-1">
-              {reasoning.summary_reasoning.key_decision_factors.map((factor, index) => (
-                <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
-                  <span className="text-blue-500 mr-2 mt-1">•</span>
-                  {factor}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderAWSServices = () => {
-    const services = question.aws_services || question.detailed_reasoning?.aws_services || [];
-    const concepts = question.key_concepts || question.detailed_reasoning?.key_concepts || [];
-
-    if (services.length === 0 && concepts.length === 0) {
-      return <p className="text-gray-500">No AWS services or concepts identified.</p>;
-    }
-
-    return (
-      <div className="space-y-4">
-        {services.length > 0 && (
-          <div>
-            <h4 className="font-medium text-blue-700 mb-3 flex items-center">
-              <Cloud size={16} className="mr-2" />
-              AWS Services Involved
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {services.map((service, index) => (
-                <span
-                  key={index}
-                  className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                >
-                  {service}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {concepts.length > 0 && (
-          <div>
-            <h4 className="font-medium text-purple-700 mb-3 flex items-center">
-              <BookOpen size={16} className="mr-2" />
-              Key Concepts Tested
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {concepts.map((concept, index) => (
-                <span
-                  key={index}
-                  className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
-                >
-                  {concept}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="mt-8 pt-6 border-t border-gray-200">
       <h3 className="text-xl font-semibold text-gray-900 mb-6">Detailed Explanation</h3>
@@ -248,22 +135,6 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
           <CheckCircle size={18} className="text-green-600" />,
           renderOptionAnalysis(),
           true // Make this expanded by default since Overview is removed
-        )}
-
-        {/* Key Insights */}
-        {question.detailed_reasoning && renderCollapsibleSection(
-          'keyInsights',
-          'Key Insights & Decision Factors',
-          <Lightbulb size={18} className="text-yellow-600" />,
-          renderKeyInsights()
-        )}
-
-        {/* AWS Services & Concepts */}
-        {renderCollapsibleSection(
-          'awsServices',
-          'AWS Services & Key Concepts',
-          <Cloud size={18} className="text-blue-600" />,
-          renderAWSServices()
         )}
       </div>
     </div>
