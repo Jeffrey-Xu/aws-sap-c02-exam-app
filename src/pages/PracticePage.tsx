@@ -26,8 +26,7 @@ const PracticePage: React.FC = () => {
   
   const { 
     questionProgress, 
-    updateQuestionProgress, 
-    markAsMastered 
+    updateQuestionProgress
   } = useProgressStore();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -92,12 +91,6 @@ const PracticePage: React.FC = () => {
   
   const handleExitFlashcards = () => {
     setShowFlashcards(false);
-  };
-  
-  const handleMarkAsMastered = () => {
-    if (currentQuestion) {
-      markAsMastered(currentQuestion.id);
-    }
   };
   
   // Calculate question counts for filters
@@ -267,17 +260,6 @@ const PracticePage: React.FC = () => {
           />
           
           {/* Additional Actions */}
-          {showExplanation && (
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                onClick={handleMarkAsMastered}
-                className="text-green-600 border-green-300 hover:bg-green-50"
-              >
-                Mark as Mastered ✓
-              </Button>
-            </div>
-          )}
         </div>
       ) : (
         <Card>
