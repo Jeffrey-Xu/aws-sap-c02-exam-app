@@ -53,16 +53,27 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [question.id]);
   
   const handleOptionSelect = (letter: string) => {
-    if (submitted) return;
+    console.log('Option selected:', letter);
+    console.log('Currently submitted:', submitted);
+    
+    if (submitted) {
+      console.log('Already submitted, ignoring selection');
+      return;
+    }
     
     if (isMultiple) {
-      setSelectedAnswers(prev => 
-        prev.includes(letter) 
+      console.log('Multiple choice question');
+      setSelectedAnswers(prev => {
+        const newAnswers = prev.includes(letter) 
           ? prev.filter(a => a !== letter)
-          : [...prev, letter]
-      );
+          : [...prev, letter];
+        console.log('New selected answers:', newAnswers);
+        return newAnswers;
+      });
     } else {
+      console.log('Single choice question');
       setSelectedAnswers([letter]);
+      console.log('Selected answer set to:', [letter]);
     }
   };
   
