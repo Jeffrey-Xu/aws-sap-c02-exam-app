@@ -1,10 +1,10 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
+import ProtectedLayout from './components/layout/ProtectedLayout';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
-import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 import { useUserProgress } from './hooks/useUserProgress';
 import { initializeProgressPersistence, cleanupProgressPersistence } from './utils/progressPersistence';
@@ -24,31 +24,25 @@ const LoadingSpinner: React.FC = () => (
   </div>
 );
 
-// Protected app content with user progress management
-const ProtectedAppContent: React.FC = () => {
-  useUserProgress(); // Automatically manage user progress loading/saving
-
-  return (
-    <Layout>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/practice" element={<PracticePage />} />
-          <Route path="/exam" element={<ExamPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/architect" element={<ArchitectGuidePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          {/* Catch all route for authenticated users */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </Layout>
-  );
+// Root route handler
+const RootRoute: React.FC = () => {
+  const { isAuthenticated } = useAuthStore();
+  
+  useUserProgress(); // Manage user progress for authenticated users
+  
+  if (isAuthenticated) {
+    return (
+      <Layout>
+        <HomePage />
+      </Layout>
+    );
+  }
+  
+  return <LandingPage />;
 };
 
 function App() {
-  const { isAuthenticated, checkSession } = useAuthStore();
+  const { checkSession } = useAuthStore();
 
   useEffect(() => {
     // Initialize progress persistence system
@@ -66,24 +60,60 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
-        <Route 
-          path="/" 
-          element={
-            isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />
-          } 
-        />
+        {/* Root route - Landing page or Dashboard based on auth */}
+        <Route path="/" element={<RootRoute />} />
+        
+        {/* Public Authentication Route */}
         <Route path="/auth" element={<AuthPage />} />
         
-        {/* Protected Routes */}
-        <Route 
-          path="/dashboard/*" 
-          element={
-            <ProtectedRoute>
-              <ProtectedAppContent />
-            </ProtectedRoute>
-          } 
-        />
+        {/* Protected Routes with clean URLs */}
+        <Route path="/practice" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PracticePage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
+        
+        <Route path="/exam" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ExamPage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
+        
+        <Route path="/analytics" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AnalyticsPage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
+        
+        <Route path="/services" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ServicesPage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
+        
+        <Route path="/architect" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ArchitectGuidePage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
+        
+        <Route path="/settings" element={
+          <ProtectedLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SettingsPage />
+            </Suspense>
+          </ProtectedLayout>
+        } />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
