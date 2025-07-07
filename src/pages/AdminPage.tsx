@@ -20,7 +20,12 @@ interface UserMetrics {
 }
 
 const AdminPage: React.FC = () => {
-  console.log('AdminPage component loaded'); // Debug log
+  console.log('AdminPage component loaded at:', window.location.pathname); // Debug log
+  
+  // Route verification
+  if (window.location.pathname !== '/admin') {
+    console.error('AdminPage loaded but pathname is not /admin:', window.location.pathname);
+  }
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
@@ -34,7 +39,7 @@ const AdminPage: React.FC = () => {
 
   // Check if already authenticated on mount
   useEffect(() => {
-    console.log('AdminPage useEffect triggered'); // Debug log
+    console.log('AdminPage useEffect triggered, pathname:', window.location.pathname); // Debug log
     const adminAuth = localStorage.getItem('admin_authenticated');
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
