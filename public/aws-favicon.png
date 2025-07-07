@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- AWS Orange Background -->
+  <rect width="32" height="32" rx="4" fill="#FF9900"/>
+  
+  <!-- AWS Text -->
+  <text x="16" y="12" font-family="Arial, sans-serif" font-size="8" font-weight="bold" text-anchor="middle" fill="white">AWS</text>
+  
+  <!-- SAP Text -->
+  <text x="16" y="22" font-family="Arial, sans-serif" font-size="6" font-weight="bold" text-anchor="middle" fill="white">SAP</text>
+  
+  <!-- Underline for AWS branding -->
+  <path d="M6 14 Q16 16 26 14" stroke="white" stroke-width="1" fill="none"/>
+</svg>

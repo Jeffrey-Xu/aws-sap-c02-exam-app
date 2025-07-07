@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'aws-favicon.svg'],
       manifest: {
         name: 'AWS SAP-C02 Exam Prep',
         short_name: 'AWS SAP-C02',

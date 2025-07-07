@@ -44,6 +44,9 @@ function App() {
   const { checkSession } = useAuthStore();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'SAP-C02 EXAM Prep';
+    
     // Initialize progress persistence system
     initializeProgressPersistence();
     
