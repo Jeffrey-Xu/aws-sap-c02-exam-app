@@ -4,6 +4,7 @@ import type { Question, ExamSession } from '../../types';
 import { parseCorrectAnswers, isMultipleChoice } from '../../utils/questionUtils';
 import Button from '../common/Button';
 import Card from '../common/Card';
+import DetailedExplanation from '../common/DetailedExplanation';
 
 interface ExamReviewProps {
   questions: Question[];
@@ -196,31 +197,11 @@ const ExamReview: React.FC<ExamReviewProps> = ({
           </div>
         </div>
         
-        {/* Explanation */}
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">Explanation</h4>
-            <p className="text-gray-700 leading-relaxed">{currentQuestion.explanation}</p>
-          </div>
-          
-          <div>
-            <h5 className="font-medium text-green-700 mb-2">✅ Why the correct answer is right:</h5>
-            <p className="text-gray-700 leading-relaxed">{currentQuestion.why_correct}</p>
-          </div>
-          
-          {currentQuestion.why_others_wrong.length > 0 && (
-            <div>
-              <h5 className="font-medium text-red-700 mb-2">❌ Why other options are wrong:</h5>
-              <ul className="space-y-2">
-                {currentQuestion.why_others_wrong.map((explanation, index) => (
-                  <li key={index} className="text-gray-700 leading-relaxed">
-                    • {explanation}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        {/* Detailed Explanation */}
+        <DetailedExplanation 
+          question={currentQuestion} 
+          userAnswer={session.answers[currentQuestion.id] || ''}
+        />
         
         {/* Navigation */}
         <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">

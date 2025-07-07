@@ -10,6 +10,34 @@ export interface Question {
   why_correct: string;
   why_others_wrong: string[];
   tags?: string[];
+  detailed_reasoning?: DetailedReasoning;
+  aws_services?: string[];
+  key_concepts?: string[];
+}
+
+export interface DetailedReasoning {
+  option_analyses: Record<string, OptionAnalysis>;
+  summary_reasoning: SummaryReasoning;
+  why_correct_answer_wins: string[];
+  common_mistakes: string[];
+  key_concepts: string[];
+  aws_services: string[];
+}
+
+export interface OptionAnalysis {
+  reasoning: string[];
+  key_points: {
+    services: string[];
+    configurations: string[];
+    status: string;
+  };
+  is_correct: boolean;
+}
+
+export interface SummaryReasoning {
+  why_correct_answer_wins: string[];
+  common_mistakes_in_wrong_answers: string[];
+  key_decision_factors: string[];
 }
 
 export interface QuestionOption {

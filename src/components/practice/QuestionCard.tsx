@@ -4,6 +4,7 @@ import type { Question } from '../../types';
 import { parseCorrectAnswers, isMultipleChoice } from '../../utils/questionUtils';
 import Button from '../common/Button';
 import Card from '../common/Card';
+import DetailedExplanation from '../common/DetailedExplanation';
 import { useProgressStore } from '../../stores/progressStore';
 
 interface QuestionCardProps {
@@ -200,32 +201,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       
       {/* Explanation */}
       {submitted && showExplanation && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Explanation</h3>
-              <p className="text-gray-700 leading-relaxed">{question.explanation}</p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-green-700 mb-2">✅ Why the correct answer is right:</h4>
-              <p className="text-gray-700 leading-relaxed">{question.why_correct}</p>
-            </div>
-            
-            {question.why_others_wrong.length > 0 && (
-              <div>
-                <h4 className="font-medium text-red-700 mb-2">❌ Why other options are wrong:</h4>
-                <ul className="space-y-2">
-                  {question.why_others_wrong.map((explanation, index) => (
-                    <li key={index} className="text-gray-700 leading-relaxed">
-                      • {explanation}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
+        <DetailedExplanation 
+          question={question} 
+          userAnswer={selectedAnswers.join('')}
+        />
       )}
     </Card>
   );
