@@ -88,9 +88,33 @@ const AdminPage: React.FC = () => {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (key && (key.includes('user') || key.includes('aws_exam_app'))) {
-            console.log(`  ${key}: ${localStorage.getItem(key)?.substring(0, 100)}...`);
+            const value = localStorage.getItem(key);
+            if (key === 'aws_exam_app_users') {
+              console.log(`  ${key}:`, value);
+              try {
+                const parsed = JSON.parse(value || '[]');
+                console.log(`    Parsed users (${parsed.length}):`, parsed.map((u: any) => ({ id: u.id, email: u.email, createdAt: u.createdAt })));
+              } catch (e) {
+                console.log('    Failed to parse users data');
+              }
+            } else {
+              console.log(`  ${key}: ${value?.substring(0, 100)}...`);
+            }
           }
         }
+        
+        // Check for any users that might be in different storage locations
+        console.log('=== CHECKING ALTERNATIVE STORAGE ===');
+        
+        // Check session storage as well
+        console.log('SessionStorage items:');
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          if (key && key.includes('user')) {
+            console.log(`  Session: ${key}`);
+          }
+        }
+        
         // Small delay to ensure any pending localStorage writes are complete
         setTimeout(() => {
           loadUserData(false);
@@ -104,7 +128,7 @@ const AdminPage: React.FC = () => {
       
       if (usersData && usersData !== 'null' && usersData !== '[]') {
         const users = JSON.parse(usersData);
-        console.log(`Found ${users.length} users in storage`);
+        console.log(`Found ${users.length} users in storage:`, users.map((u: any) => ({ email: u.email, id: u.id, createdAt: u.createdAt })));
         
         users.forEach((user: any) => {
           try {
@@ -254,6 +278,7 @@ const AdminPage: React.FC = () => {
       }
       
       console.log(`Final userData array: ${userData.length} users found`);
+      console.log('Users:', userData.map(u => ({ email: u.email, id: u.userId, registered: u.registrationDate })));
       setUsers(userData);
     } catch (err) {
       setError('Failed to load user data');
