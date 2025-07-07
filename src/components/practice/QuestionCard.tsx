@@ -71,6 +71,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     
     const answer = selectedAnswers.sort().join('');
     setSubmitted(true);
+    
+    // Add temporary debugging
+    console.log('Submit successful - submitted state set to true');
+    console.log('Selected answers:', selectedAnswers);
+    console.log('Final answer:', answer);
+    
     onAnswer(answer, timeSpent);
   };
   
@@ -190,17 +196,20 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               Submit Answer
             </Button>
           ) : (
-            onNext && (
-              <Button onClick={onNext}>
-                Next Question
-              </Button>
-            )
+            <div className="flex items-center space-x-3">
+              <div className="text-green-600 font-medium">Answer Submitted!</div>
+              {onNext && (
+                <Button onClick={onNext}>
+                  Next Question
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>
       
       {/* Explanation */}
-      {submitted && showExplanation && (
+      {submitted && (
         <DetailedExplanation 
           question={question} 
           userAnswer={selectedAnswers.join('')}
