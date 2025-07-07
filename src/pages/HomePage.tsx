@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useCallback } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle, Clock, TrendingUp } from 'lucide-react';
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
 import { useQuestionStore } from '../stores/questionStore';
 import { useProgressStore } from '../stores/progressStore';
+import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES, DOMAIN_INFO } from '../constants';
 import { calculateReadinessScore, safePercentage, safeNumber, formatTime } from '../utils/questionUtils';
 import type { QuestionStatus } from '../types';
 
 const HomePage: React.FC = () => {
+  const location = useLocation();
   const { questions, loading, loadQuestions } = useQuestionStore();
   const { 
     totalQuestions, 
@@ -19,8 +21,12 @@ const HomePage: React.FC = () => {
     examAttempts,
     calculateProgress,
     questionProgress,
-    totalStudyTime
+    totalStudyTime,
+    loadUserProgress
   } = useProgressStore();
+  
+  // Use data refresh hook for tab switching
+  const { refreshAllData } = useDataRefresh();
   
   // Calculate status statistics
   const statusStats = React.useMemo(() => {
@@ -43,6 +49,7 @@ const HomePage: React.FC = () => {
     return stats;
   }, [questionProgress, questions.length]);
   
+  // Initial data loading
   useEffect(() => {
     if (questions.length === 0 && !loading) {
       loadQuestions();

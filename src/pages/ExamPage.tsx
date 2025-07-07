@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ArrowLeft, Play, Square, Eye, History } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ExamTimer from '../components/exam/ExamTimer';
 import ExamQuestion from '../components/exam/ExamQuestion';
 import QuestionNavigator from '../components/exam/QuestionNavigator';
@@ -16,11 +16,13 @@ import { useQuestionStore } from '../stores/questionStore';
 import { useExamStore } from '../stores/examStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
+import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES, EXAM_CONFIG } from '../constants';
 import { getRandomQuestions, getQuestionsWithDomainRatio } from '../utils/questionUtils';
 import type { Question } from '../types';
 
 const ExamPage: React.FC = () => {
+  const location = useLocation();
   const { questions, loading, loadQuestions } = useQuestionStore();
   const { addExamAttempt } = useProgressStore();
   const {
@@ -54,6 +56,9 @@ const ExamPage: React.FC = () => {
   
   // Custom dialog hook
   const { dialogState, showDialog, hideDialog } = useConfirmDialog();
+  
+  // Use data refresh hook for tab switching
+  const { refreshAllData } = useDataRefresh();
   
   useEffect(() => {
     if (questions.length === 0 && !loading) {

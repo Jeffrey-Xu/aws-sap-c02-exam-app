@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ArrowLeft, BarChart3, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import QuestionCard from '../components/practice/QuestionCard';
 import QuestionFilters from '../components/practice/QuestionFilters';
 import SmartRecommendations from '../components/practice/SmartRecommendations';
@@ -10,10 +10,12 @@ import Card from '../components/common/Card';
 import { useQuestionStore } from '../stores/questionStore';
 import { categorizeQuestion } from '../utils/questionUtils';
 import { useProgressStore } from '../stores/progressStore';
+import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES } from '../constants';
 import type { ExamDomain, QuestionStatus } from '../types';
 
 const PracticePage: React.FC = () => {
+  const location = useLocation();
   const { 
     questions, 
     filteredQuestions, 
@@ -28,6 +30,9 @@ const PracticePage: React.FC = () => {
     questionProgress, 
     updateQuestionProgress
   } = useProgressStore();
+  
+  // Use data refresh hook for tab switching
+  const { refreshAllData } = useDataRefresh();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showExplanation, setShowExplanation] = useState(false);

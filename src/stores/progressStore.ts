@@ -67,6 +67,7 @@ interface ProgressStore extends UserProgress {
   addQuestionNote: (questionId: number, note: string) => void;
   getBookmarkedQuestions: () => QuestionProgress[];
   calculateProgress: (totalQuestions: number, questionsByCategory: Record<ExamDomain, number>) => void;
+  refreshProgress: () => void;
   getQuestionProgress: (questionId: number) => QuestionProgress;
   addExamAttempt: (examSession: any) => void;
   resetProgress: () => void;
@@ -320,6 +321,60 @@ export const useProgressStore = create<ProgressStore>()(
 
           return {
             totalQuestions,
+            masteredQuestions: masteredCount,
+            categoryProgress
+          };
+        });
+      },
+
+      refreshProgress: () => {
+        set((state) => {
+          // Force recalculation of all progress metrics
+          const masteredCount = Object.values(state.questionProgress)
+            .filter(progress => progress.status === 'mastered').length;
+          
+          // Recalculate category progress
+          const categoryProgress: Record<ExamDomain, CategoryProgress> = {} as Record<ExamDomain, CategoryProgress>;
+          
+          // Group questions by domain
+          const questionsByDomain: Record<string, QuestionProgress[]> = {};
+          Object.values(state.questionProgress).forEach(progress => {
+            if (!questionsByDomain[progress.domain]) {
+              questionsByDomain[progress.domain] = [];
+            }
+            questionsByDomain[progress.domain].push(progress);
+          });
+          
+          // Calculate progress for each domain
+          Object.entries(questionsByDomain).forEach(([domain, domainQuestions]) => {
+            const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
+            const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
+            
+            // Calculate average score based on actual attempts
+            let averageScore = 0;
+            if (domainQuestions.length > 0) {
+              const attemptedQuestions = domainQuestions.filter(progress => progress.attempts > 0);
+              
+              if (attemptedQuestions.length > 0) {
+                const totalSuccessRate = attemptedQuestions.reduce((sum, progress) => {
+                  return sum + (progress.correctAttempts / progress.attempts);
+                }, 0);
+                averageScore = (totalSuccessRate / attemptedQuestions.length) * 100;
+              }
+            }
+
+            categoryProgress[domain as ExamDomain] = {
+              domain: domain as ExamDomain,
+              totalQuestions: domainQuestions.length,
+              masteredQuestions: masteredInDomain,
+              averageScore: Math.round(averageScore * 100) / 100,
+              timeSpent: totalTimeInDomain,
+              lastStudied: new Date()
+            };
+          });
+          
+          return {
+            ...state,
             masteredQuestions: masteredCount,
             categoryProgress
           };
