@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Shield, BookOpen, Users, Award } from 'lucide-react';
+import { Shield, BookOpen, Users, Award, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
+import { resetAuthenticationSystem, migrateExistingUsers, checkAuthenticationStatus } from '../utils/resetAuth';
 import { ROUTES } from '../constants';
 
 type AuthMode = 'login' | 'signup' | 'forgot-password';
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
+  const [showDebug, setShowDebug] = useState(false);
   
-  const { isAuthenticated, checkSession } = useAuthStore();
+  const { isAuthenticated, checkSession, clearError } = useAuthStore();
 
   useEffect(() => {
     checkSession();
+    // Automatically migrate existing users on page load
+    migrateExistingUsers();
   }, [checkSession]);
 
   // Redirect if already authenticated
@@ -25,6 +29,26 @@ const AuthPage: React.FC = () => {
   const handleSwitchToSignup = () => setMode('signup');
   const handleSwitchToLogin = () => setMode('login');
   const handleForgotPassword = () => setMode('forgot-password');
+
+  const handleResetAuth = () => {
+    if (window.confirm('This will clear all users and sessions. Are you sure?')) {
+      resetAuthenticationSystem();
+      clearError();
+      window.location.reload();
+    }
+  };
+
+  const handleMigrateUsers = () => {
+    const count = migrateExistingUsers();
+    alert(`Migrated ${count} users to verified status`);
+    clearError();
+    window.location.reload();
+  };
+
+  const handleCheckStatus = () => {
+    checkAuthenticationStatus();
+    alert('Check browser console for authentication status details');
+  };
 
   const renderAuthForm = () => {
     switch (mode) {
@@ -64,6 +88,39 @@ const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
+      {/* Debug Panel */}
+      {showDebug && (
+        <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50 max-w-sm">
+          <h3 className="font-bold text-gray-900 mb-3">Debug Tools</h3>
+          <div className="space-y-2">
+            <button
+              onClick={handleCheckStatus}
+              className="w-full text-left px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 rounded"
+            >
+              Check Auth Status
+            </button>
+            <button
+              onClick={handleMigrateUsers}
+              className="w-full text-left px-3 py-2 text-sm bg-green-50 hover:bg-green-100 rounded"
+            >
+              Migrate Users
+            </button>
+            <button
+              onClick={handleResetAuth}
+              className="w-full text-left px-3 py-2 text-sm bg-red-50 hover:bg-red-100 rounded text-red-700"
+            >
+              Reset All Data
+            </button>
+            <button
+              onClick={() => setShowDebug(false)}
+              className="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded"
+            >
+              Close Debug
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-aws-orange to-orange-600 p-12 flex-col justify-center">
         <div className="text-white">
@@ -118,7 +175,16 @@ const AuthPage: React.FC = () => {
       </div>
 
       {/* Right Side - Authentication Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
+        {/* Debug Toggle Button */}
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          className="absolute top-4 right-4 p-2 bg-gray-200 hover:bg-gray-300 rounded-full"
+          title="Debug Tools"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </button>
+
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
