@@ -15,6 +15,7 @@ const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ExamPage = lazy(() => import('./pages/ExamPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 
 // Loading component
 const LoadingSpinner: React.FC = () => (
@@ -102,6 +103,13 @@ function App() {
               <SettingsPage />
             </Suspense>
           </ProtectedLayout>
+        } />
+        
+        {/* Admin route - hidden from navigation */}
+        <Route path="/admin" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <AdminPage />
+          </Suspense>
         } />
         
         {/* Catch all route */}

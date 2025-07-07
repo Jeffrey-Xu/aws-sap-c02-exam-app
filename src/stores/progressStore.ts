@@ -68,6 +68,7 @@ interface ProgressStore extends UserProgress {
   getBookmarkedQuestions: () => QuestionProgress[];
   calculateProgress: (totalQuestions: number, questionsByCategory: Record<ExamDomain, number>) => void;
   refreshProgress: () => void;
+  trackUserActivity: (activity: string) => void;
   getQuestionProgress: (questionId: number) => QuestionProgress;
   addExamAttempt: (examSession: any) => void;
   resetProgress: () => void;
@@ -379,6 +380,22 @@ export const useProgressStore = create<ProgressStore>()(
             categoryProgress
           };
         });
+      },
+
+      trackUserActivity: (activity: string) => {
+        set((state) => ({
+          ...state,
+          lastStudied: new Date(),
+          // Store activity log for admin tracking
+          activityLog: [
+            ...(state as any).activityLog?.slice(-49) || [], // Keep last 50 activities
+            {
+              activity,
+              timestamp: new Date().toISOString(),
+              date: new Date().toDateString()
+            }
+          ]
+        }));
       },
 
       getQuestionProgress: (questionId: number) => {
