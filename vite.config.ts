@@ -30,7 +30,14 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        // Increase the maximum file size for caching to 5MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        // Exclude large JSON files from precaching but allow runtime caching
+        globIgnores: [
+          '**/data/questions*.json',
+          '**/questions_enhanced.json'
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -40,6 +47,29 @@ export default defineConfig({
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              }
+            }
+          },
+          // Runtime caching for large JSON files
+          {
+            urlPattern: /\/data\/questions.*\.json$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'questions-cache',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 1 week
+              }
+            }
+          },
+          {
+            urlPattern: /\/questions_enhanced\.json$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'questions-cache',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 1 week
               }
             }
           }
