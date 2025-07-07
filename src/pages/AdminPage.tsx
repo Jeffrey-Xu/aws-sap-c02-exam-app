@@ -44,6 +44,17 @@ const AdminPage: React.FC = () => {
     }
   }, []);
 
+  // Auto-refresh user data every 30 seconds when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const interval = setInterval(() => {
+        loadUserData();
+      }, 30000); // Refresh every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -65,16 +76,35 @@ const AdminPage: React.FC = () => {
     setUsers([]);
   };
 
-  const loadUserData = () => {
+  const loadUserData = (forceRefresh = false) => {
     setLoading(true);
     try {
       const userData: UserMetrics[] = [];
       
+      // Force refresh by clearing any potential caching
+      if (forceRefresh) {
+        console.log('=== FORCE REFRESH TRIGGERED ===');
+        console.log('Current localStorage keys:');
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('user') || key.includes('aws_exam_app'))) {
+            console.log(`  ${key}: ${localStorage.getItem(key)?.substring(0, 100)}...`);
+          }
+        }
+        // Small delay to ensure any pending localStorage writes are complete
+        setTimeout(() => {
+          loadUserData(false);
+        }, 100);
+        return;
+      }
+      
       // Get user data from auth store
       const usersData = localStorage.getItem('aws_exam_app_users');
+      console.log('Current aws_exam_app_users:', usersData);
       
       if (usersData && usersData !== 'null' && usersData !== '[]') {
         const users = JSON.parse(usersData);
+        console.log(`Found ${users.length} users in storage`);
         
         users.forEach((user: any) => {
           try {
@@ -144,10 +174,13 @@ const AdminPage: React.FC = () => {
           }
         });
       } else {
+        console.log('No users found in aws_exam_app_users, checking progress keys...');
         // If no users in aws_exam_app_users, try to extract from progress keys directly
         const progressKeys = Object.keys(localStorage).filter(key => 
           key.startsWith('progress-store-') || key.startsWith('user_progress_')
         );
+        
+        console.log('Found progress keys:', progressKeys);
         
         progressKeys.forEach(key => {
           try {
@@ -220,6 +253,7 @@ const AdminPage: React.FC = () => {
         });
       }
       
+      console.log(`Final userData array: ${userData.length} users found`);
       setUsers(userData);
     } catch (err) {
       setError('Failed to load user data');
@@ -369,9 +403,9 @@ const AdminPage: React.FC = () => {
             <p className="text-gray-600">AWS SAP-C02 Exam Prep - User Management</p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button onClick={loadUserData} variant="outline" disabled={loading}>
+            <Button onClick={() => loadUserData(true)} variant="outline" disabled={loading}>
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              Force Refresh
             </Button>
             <Button onClick={exportData} variant="outline">
               <Download className="w-4 h-4 mr-2" />
