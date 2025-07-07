@@ -219,7 +219,7 @@ const ExamPreview: React.FC<ExamPreviewProps> = ({
                       <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center text-sm font-medium">
                         {option.letter}
                       </div>
-                      <div className="flex-1 text-sm text-gray-700">
+                      <div className="flex-1 text-sm text-gray-700 break-words">
                         {option.text}
                       </div>
                     </div>

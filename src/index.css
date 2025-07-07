@@ -110,6 +110,10 @@
     border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.2s;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    white-space: normal;
   }
   
   .question-option:hover {

@@ -124,7 +124,7 @@ const ExamQuestion: React.FC<ExamQuestionProps> = ({
               <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-sm font-medium">
                 {option.letter}
               </div>
-              <div className="flex-1 text-sm leading-relaxed">
+              <div className="flex-1 text-sm leading-relaxed break-words">
                 {option.text}
               </div>
             </div>
