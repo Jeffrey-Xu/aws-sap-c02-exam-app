@@ -289,14 +289,30 @@ export const useProgressStore = create<ProgressStore>()(
             
             const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
             const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
-            const averageScore = domainQuestions.length > 0 ? 
-              domainQuestions.reduce((sum, progress) => sum + (progress.correctAttempts / Math.max(progress.attempts, 1)), 0) / domainQuestions.length : 0;
+            
+            // Calculate average score based on actual attempts
+            let averageScore = 0;
+            if (domainQuestions.length > 0) {
+              // Only include questions that have been attempted (attempts > 0)
+              const attemptedQuestions = domainQuestions.filter(progress => progress.attempts > 0);
+              
+              if (attemptedQuestions.length > 0) {
+                // Calculate success rate for attempted questions
+                const totalSuccessRate = attemptedQuestions.reduce((sum, progress) => {
+                  return sum + (progress.correctAttempts / progress.attempts);
+                }, 0);
+                averageScore = (totalSuccessRate / attemptedQuestions.length) * 100;
+              } else {
+                // No questions attempted in this domain
+                averageScore = 0;
+              }
+            }
 
             categoryProgress[domain as ExamDomain] = {
               domain: domain as ExamDomain,
               totalQuestions: count,
               masteredQuestions: masteredInDomain,
-              averageScore: averageScore * 100,
+              averageScore: Math.round(averageScore * 100) / 100, // Round to 2 decimal places
               timeSpent: totalTimeInDomain,
               lastStudied: new Date()
             };

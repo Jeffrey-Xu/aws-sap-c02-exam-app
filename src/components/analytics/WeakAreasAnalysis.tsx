@@ -31,21 +31,30 @@ const WeakAreasAnalysis: React.FC<WeakAreasAnalysisProps> = ({
       const domainKey = domain as ExamDomain;
       const score = progress.averageScore || 0;
       const attempts = progress.totalQuestions || 0;
+      const masteredCount = progress.masteredQuestions || 0;
+      
+      // Skip domains with no questions
+      if (attempts === 0) return;
       
       let priority: 'high' | 'medium' | 'low' = 'low';
       let recommendation = '';
       
-      if (score < 50) {
+      // Calculate mastery percentage
+      const masteryPercentage = attempts > 0 ? (masteredCount / attempts) * 100 : 0;
+      
+      // Determine priority based on both score and mastery
+      if (score < 50 || masteryPercentage < 20) {
         priority = 'high';
-        recommendation = 'Critical - Focus immediately on fundamentals';
-      } else if (score < 70) {
+        recommendation = `Critical - ${Math.round(score)}% accuracy, ${Math.round(masteryPercentage)}% mastered. Focus on fundamentals.`;
+      } else if (score < 70 || masteryPercentage < 50) {
         priority = 'medium';
-        recommendation = 'Important - Regular practice needed';
-      } else if (score < 85) {
+        recommendation = `Important - ${Math.round(score)}% accuracy, ${Math.round(masteryPercentage)}% mastered. Regular practice needed.`;
+      } else if (score < 85 || masteryPercentage < 80) {
         priority = 'low';
-        recommendation = 'Good - Occasional review recommended';
+        recommendation = `Good progress - ${Math.round(score)}% accuracy, ${Math.round(masteryPercentage)}% mastered. Occasional review recommended.`;
       } else {
-        return; // Skip strong areas
+        // Strong area - only show if specifically requested or for completeness
+        return;
       }
       
       weakAreas.push({
@@ -58,9 +67,13 @@ const WeakAreasAnalysis: React.FC<WeakAreasAnalysisProps> = ({
       });
     });
     
+    // Sort by priority and then by score (lowest first)
     return weakAreas.sort((a, b) => {
       const priorityOrder = { high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority];
+      if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
+      return a.score - b.score; // Lower scores first within same priority
     });
   };
 
@@ -141,6 +154,24 @@ const WeakAreasAnalysis: React.FC<WeakAreasAnalysisProps> = ({
         <p className="text-gray-600">
           Focus your study time on these areas to improve your exam readiness
         </p>
+      </div>
+
+      {/* Debug Information - Remove in production */}
+      <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs">
+        <details>
+          <summary className="cursor-pointer font-medium text-gray-700 mb-2">
+            Debug: Raw Category Progress Data
+          </summary>
+          <div className="space-y-2">
+            {Object.entries(categoryProgress).map(([domain, progress]) => (
+              <div key={domain} className="text-gray-600">
+                <strong>{domain}:</strong> Score: {progress.averageScore?.toFixed(2)}%, 
+                Mastered: {progress.masteredQuestions}/{progress.totalQuestions}, 
+                Time: {formatTime(progress.timeSpent)}
+              </div>
+            ))}
+          </div>
+        </details>
       </div>
 
       <div className="space-y-4">
