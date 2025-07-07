@@ -125,15 +125,66 @@ const AnalyticsPage: React.FC = () => {
       {/* Domain Performance Details */}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">Detailed Domain Performance</h2>
+        
+        {/* Debug Information - Remove in production */}
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs">
+          <details>
+            <summary className="cursor-pointer font-medium text-gray-700 mb-2">
+              Debug: Domain Performance Data
+            </summary>
+            <div className="space-y-2">
+              {Object.entries(DOMAIN_INFO).map(([domain, info]) => {
+                const progress = categoryProgress[domain as keyof typeof categoryProgress];
+                return (
+                  <div key={domain} className="text-gray-600">
+                    <strong>{domain}:</strong> 
+                    Total: {progress?.totalQuestions || 'undefined'}, 
+                    Mastered: {progress?.masteredQuestions || 'undefined'}, 
+                    AvgScore: {progress?.averageScore?.toFixed(2) || 'undefined'}%, 
+                    Time: {progress?.timeSpent || 'undefined'}s
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        </div>
+        
         <div className="space-y-6">
           {Object.entries(DOMAIN_INFO).map(([domain, info]) => {
             const progress = categoryProgress[domain as keyof typeof categoryProgress];
-            const percentage = safePercentage(
-              progress?.masteredQuestions || 0, 
-              progress?.totalQuestions || 1
+            
+            // Handle case where no progress data exists for this domain
+            if (!progress || !progress.totalQuestions) {
+              return (
+                <div key={domain} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{info.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{info.description}</p>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span>{info.percentage}% of exam</span>
+                        <span>•</span>
+                        <span>No questions attempted yet</span>
+                      </div>
+                    </div>
+                    <div className="text-right ml-4">
+                      <div className="text-2xl font-bold text-gray-400">0%</div>
+                      <div className="text-sm text-gray-400">0 / 0</div>
+                    </div>
+                  </div>
+                  <div className="text-center py-4 text-gray-500">
+                    <p className="text-sm">Start practicing questions in this domain to see your progress</p>
+                  </div>
+                </div>
+              );
+            }
+            
+            const masteryPercentage = safePercentage(
+              progress.masteredQuestions, 
+              progress.totalQuestions
             );
-            const averageScore = safeNumber(progress?.averageScore, 0);
-            const timeSpent = safeNumber(progress?.timeSpent, 0);
+            const averageScore = safeNumber(progress.averageScore, 0);
+            const timeSpent = safeNumber(progress.timeSpent, 0);
             
             return (
               <div key={domain} className="border border-gray-200 rounded-lg p-4">
@@ -150,26 +201,26 @@ const AnalyticsPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right ml-4">
-                    <div className="text-2xl font-bold text-gray-900">{percentage}%</div>
+                    <div className="text-2xl font-bold text-gray-900">{masteryPercentage}%</div>
                     <div className="text-sm text-gray-500">
-                      {progress?.masteredQuestions || 0} / {progress?.totalQuestions || 0}
+                      {progress.masteredQuestions} / {progress.totalQuestions}
                     </div>
                   </div>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Mastery Progress</span>
-                    <span className="font-medium">{percentage}%</span>
+                    <span className="text-gray-600">Questions Mastered</span>
+                    <span className="font-medium">{masteryPercentage}% ({progress.masteredQuestions} / {progress.totalQuestions})</span>
                   </div>
                   <ProgressBar
-                    value={progress?.masteredQuestions || 0}
-                    max={progress?.totalQuestions || 1}
-                    color={percentage >= 70 ? 'green' : percentage >= 50 ? 'orange' : 'red'}
+                    value={progress.masteredQuestions}
+                    max={progress.totalQuestions}
+                    color={masteryPercentage >= 70 ? 'green' : masteryPercentage >= 50 ? 'orange' : 'red'}
                   />
                   
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Average Score</span>
+                    <span className="text-gray-600">Average Accuracy</span>
                     <span className="font-medium">{Math.round(averageScore)}%</span>
                   </div>
                   <ProgressBar
@@ -178,6 +229,18 @@ const AnalyticsPage: React.FC = () => {
                     color={averageScore >= 70 ? 'green' : averageScore >= 50 ? 'orange' : 'red'}
                     size="sm"
                   />
+                  
+                  {/* Additional insights */}
+                  <div className="pt-2 border-t border-gray-100">
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Study Time</span>
+                      <span>{formatTime(timeSpent)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Exam Weight</span>
+                      <span>{info.percentage}% of total exam</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
