@@ -66,6 +66,13 @@ function App() {
       <UserProgressManager />
       
       <Routes>
+        {/* Admin route - must be first to prevent redirects */}
+        <Route path="/admin" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <AdminPage />
+          </Suspense>
+        } />
+        
         {/* Root route - Landing page or Dashboard based on auth */}
         <Route path="/" element={<RootRoute />} />
         
@@ -103,13 +110,6 @@ function App() {
               <SettingsPage />
             </Suspense>
           </ProtectedLayout>
-        } />
-        
-        {/* Admin route - hidden from navigation */}
-        <Route path="/admin" element={
-          <Suspense fallback={<LoadingSpinner />}>
-            <AdminPage />
-          </Suspense>
         } />
         
         {/* Catch all route */}

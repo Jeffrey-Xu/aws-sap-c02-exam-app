@@ -20,6 +20,8 @@ interface UserMetrics {
 }
 
 const AdminPage: React.FC = () => {
+  console.log('AdminPage component loaded'); // Debug log
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +34,7 @@ const AdminPage: React.FC = () => {
 
   // Check if already authenticated on mount
   useEffect(() => {
+    console.log('AdminPage useEffect triggered'); // Debug log
     const adminAuth = localStorage.getItem('admin_authenticated');
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
