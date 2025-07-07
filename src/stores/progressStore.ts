@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { QuestionProgress, CategoryProgress, ExamDomain, UserProgress } from '../types';
-import { STORAGE_KEYS } from '../constants';
-import { ProgressPersistence } from '../utils/progressPersistence';
 
 interface ProgressStore extends UserProgress {
   questionProgress: Record<number, QuestionProgress>;
@@ -24,6 +22,11 @@ interface ProgressStore extends UserProgress {
   exportProgress: () => string;
   importProgress: (data: string) => boolean;
   getStorageStats: () => any;
+  
+  // Multi-user support
+  loadUserProgress: (userId: string) => void;
+  saveUserProgress: (userId: string) => void;
+  clearUserProgress: (userId: string) => void;
 }
 
 const defaultQuestionProgress = (questionId: number): QuestionProgress => ({
@@ -37,198 +40,285 @@ const defaultQuestionProgress = (questionId: number): QuestionProgress => ({
   notes: ''
 });
 
+// Helper functions for user-specific storage
+const getUserProgressKey = (userId: string) => `user_progress_${userId}`;
+
+const loadUserProgressData = (userId: string): Partial<ProgressStore> => {
+  try {
+    const key = getUserProgressKey(userId);
+    const data = localStorage.getItem(key);
+    if (data) {
+      const parsed = JSON.parse(data);
+      // Convert date strings back to Date objects
+      if (parsed.questionProgress) {
+        Object.values(parsed.questionProgress).forEach((progress: any) => {
+          if (progress.lastAttempted) {
+            progress.lastAttempted = new Date(progress.lastAttempted);
+          }
+          if (progress.masteredAt) {
+            progress.masteredAt = new Date(progress.masteredAt);
+          }
+        });
+      }
+      if (parsed.examAttempts) {
+        parsed.examAttempts.forEach((attempt: any) => {
+          if (attempt.startTime) attempt.startTime = new Date(attempt.startTime);
+          if (attempt.endTime) attempt.endTime = new Date(attempt.endTime);
+        });
+      }
+      if (parsed.categoryProgress) {
+        Object.values(parsed.categoryProgress).forEach((category: any) => {
+          if (category.lastStudied) {
+            category.lastStudied = new Date(category.lastStudied);
+          }
+        });
+      }
+      if (parsed.lastStudied) {
+        parsed.lastStudied = new Date(parsed.lastStudied);
+      }
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Error loading user progress:', error);
+  }
+  return {};
+};
+
+const saveUserProgressData = (userId: string, data: Partial<ProgressStore>) => {
+  try {
+    const key = getUserProgressKey(userId);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving user progress:', error);
+  }
+};
+
 export const useProgressStore = create<ProgressStore>()(
   persist(
     (set, get) => ({
-        questionProgress: {},
-        totalQuestions: 0,
-        masteredQuestions: 0,
-        categoryProgress: {} as Record<ExamDomain, CategoryProgress>,
-        studyStreak: 0,
-        totalStudyTime: 0,
-        examAttempts: [],
-      
-      updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        const updated: QuestionProgress = {
-          ...current,
-          attempts: current.attempts + 1,
-          correctAttempts: correct ? current.correctAttempts + 1 : current.correctAttempts,
-          lastAttempted: new Date(),
-          timeSpent: current.timeSpent + timeSpent,
-          status: correct && current.correctAttempts >= 2 ? 'mastered' : 
-                  correct ? 'practicing' : 'needs-review'
+      questionProgress: {},
+      totalQuestions: 0,
+      masteredQuestions: 0,
+      categoryProgress: {} as Record<ExamDomain, CategoryProgress>,
+      studyStreak: 0,
+      totalStudyTime: 0,
+      examAttempts: [],
+
+      loadUserProgress: (userId: string) => {
+        const userData = loadUserProgressData(userId);
+        set({
+          questionProgress: userData.questionProgress || {},
+          totalQuestions: userData.totalQuestions || 0,
+          masteredQuestions: userData.masteredQuestions || 0,
+          categoryProgress: userData.categoryProgress || {} as Record<ExamDomain, CategoryProgress>,
+          studyStreak: userData.studyStreak || 0,
+          totalStudyTime: userData.totalStudyTime || 0,
+          examAttempts: userData.examAttempts || [],
+          lastStudied: userData.lastStudied
+        });
+      },
+
+      saveUserProgress: (userId: string) => {
+        const state = get();
+        const dataToSave = {
+          questionProgress: state.questionProgress,
+          totalQuestions: state.totalQuestions,
+          masteredQuestions: state.masteredQuestions,
+          categoryProgress: state.categoryProgress,
+          studyStreak: state.studyStreak,
+          totalStudyTime: state.totalStudyTime,
+          examAttempts: state.examAttempts,
+          lastStudied: state.lastStudied
         };
-        
-        if (updated.status === 'mastered' && !current.masteredAt) {
-          updated.masteredAt = new Date();
+        saveUserProgressData(userId, dataToSave);
+      },
+
+      clearUserProgress: (userId: string) => {
+        try {
+          const key = getUserProgressKey(userId);
+          localStorage.removeItem(key);
+        } catch (error) {
+          console.error('Error clearing user progress:', error);
         }
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: updated
-          },
-          totalStudyTime: get().totalStudyTime + timeSpent,
-          lastStudied: new Date()
-        });
       },
-      
-      markAsMastered: (questionId: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              status: 'mastered',
-              masteredAt: new Date()
-            }
-          }
-        });
-      },
-      
-      markForReview: (questionId: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              status: 'needs-review'
-            }
-          }
-        });
-      },
-      
-      addBookmark: (questionId: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              bookmarked: true
-            }
-          }
-        });
-      },
-      
-      removeBookmark: (questionId: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              bookmarked: false
-            }
-          }
-        });
-      },
-      
-      addNote: (questionId: number, note: string) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              notes: note
-            }
-          }
-        });
-      },
-      
-      calculateProgress: (totalQuestions: number, questionsByCategory: Record<ExamDomain, number>) => {
-        const { questionProgress } = get();
-        
-        const masteredCount = Object.values(questionProgress)
-          .filter(p => p.status === 'mastered').length;
-        
-        const categoryProgress: Record<ExamDomain, CategoryProgress> = {} as Record<ExamDomain, CategoryProgress>;
-        
-        Object.entries(questionsByCategory).forEach(([domain, total]) => {
-          const domainProgress = Object.values(questionProgress)
-            .filter(p => p.status === 'mastered'); // This would need category mapping
+
+      updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
           
-          categoryProgress[domain as ExamDomain] = {
-            domain: domain as ExamDomain,
-            totalQuestions: total,
-            masteredQuestions: domainProgress.length, // Simplified for now
-            averageScore: 0, // Calculate based on attempts
-            timeSpent: Object.values(questionProgress)
-              .reduce((sum, p) => sum + p.timeSpent, 0),
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            attempts: currentProgress.attempts + 1,
+            correctAttempts: correct ? currentProgress.correctAttempts + 1 : currentProgress.correctAttempts,
+            lastAttempted: new Date(),
+            timeSpent: currentProgress.timeSpent + timeSpent,
+            status: correct && currentProgress.correctAttempts >= 2 ? 'mastered' : 
+                   correct ? 'practicing' : 'needs-review'
+          };
+
+          if (updatedProgress.status === 'mastered' && !currentProgress.masteredAt) {
+            updatedProgress.masteredAt = new Date();
+          }
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            },
+            totalStudyTime: state.totalStudyTime + timeSpent,
             lastStudied: new Date()
           };
         });
-        
-        set({
-          totalQuestions,
-          masteredQuestions: masteredCount,
-          categoryProgress
+      },
+
+      markAsMastered: (questionId: number) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            status: 'mastered',
+            masteredAt: new Date()
+          };
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            }
+          };
         });
       },
-      
-      // Bookmark actions
+
+      markForReview: (questionId: number) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            status: 'needs-review'
+          };
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            }
+          };
+        });
+      },
+
+      addBookmark: (questionId: number) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            bookmarked: true
+          };
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            }
+          };
+        });
+      },
+
+      removeBookmark: (questionId: number) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            bookmarked: false
+          };
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            }
+          };
+        });
+      },
+
+      addNote: (questionId: number, note: string) => {
+        set((state) => {
+          const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+          const updatedProgress: QuestionProgress = {
+            ...currentProgress,
+            notes: note
+          };
+
+          return {
+            questionProgress: {
+              ...state.questionProgress,
+              [questionId]: updatedProgress
+            }
+          };
+        });
+      },
+
       toggleBookmark: (questionId: number) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              bookmarked: !current.bookmarked
-            }
-          }
-        });
+        const state = get();
+        const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
+        if (currentProgress.bookmarked) {
+          state.removeBookmark(questionId);
+        } else {
+          state.addBookmark(questionId);
+        }
       },
-      
+
       addQuestionNote: (questionId: number, note: string) => {
-        const { questionProgress } = get();
-        const current = questionProgress[questionId] || defaultQuestionProgress(questionId);
-        
-        set({
-          questionProgress: {
-            ...questionProgress,
-            [questionId]: {
-              ...current,
-              notes: note
-            }
-          }
+        get().addNote(questionId, note);
+      },
+
+      getBookmarkedQuestions: () => {
+        const state = get();
+        return Object.values(state.questionProgress).filter(progress => progress.bookmarked);
+      },
+
+      calculateProgress: (totalQuestions: number, questionsByCategory: Record<ExamDomain, number>) => {
+        set((state) => {
+          const masteredCount = Object.values(state.questionProgress)
+            .filter(progress => progress.status === 'mastered').length;
+
+          const categoryProgress: Record<ExamDomain, CategoryProgress> = {} as Record<ExamDomain, CategoryProgress>;
+          
+          Object.entries(questionsByCategory).forEach(([domain, count]) => {
+            const domainQuestions = Object.values(state.questionProgress);
+            const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
+            const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
+            const averageScore = domainQuestions.length > 0 ? 
+              domainQuestions.reduce((sum, progress) => sum + (progress.correctAttempts / Math.max(progress.attempts, 1)), 0) / domainQuestions.length : 0;
+
+            categoryProgress[domain as ExamDomain] = {
+              domain: domain as ExamDomain,
+              totalQuestions: count,
+              masteredQuestions: masteredInDomain,
+              averageScore: averageScore * 100,
+              timeSpent: totalTimeInDomain,
+              lastStudied: new Date()
+            };
+          });
+
+          return {
+            totalQuestions,
+            masteredQuestions: masteredCount,
+            categoryProgress
+          };
         });
       },
-      
-      getBookmarkedQuestions: () => {
-        const { questionProgress } = get();
-        return Object.values(questionProgress).filter(q => q.bookmarked);
-      },
-      
+
       getQuestionProgress: (questionId: number) => {
-        const { questionProgress } = get();
-        return questionProgress[questionId] || defaultQuestionProgress(questionId);
+        const state = get();
+        return state.questionProgress[questionId] || defaultQuestionProgress(questionId);
       },
-      
+
       addExamAttempt: (examSession: any) => {
         set((state) => ({
           examAttempts: [...state.examAttempts, examSession]
         }));
       },
-      
+
       resetProgress: () => {
         set({
           questionProgress: {},
@@ -237,53 +327,98 @@ export const useProgressStore = create<ProgressStore>()(
           categoryProgress: {} as Record<ExamDomain, CategoryProgress>,
           studyStreak: 0,
           totalStudyTime: 0,
-          examAttempts: []
+          examAttempts: [],
+          lastStudied: undefined
         });
       },
-      
+
       exportProgress: () => {
-        return ProgressPersistence.exportProgress();
+        const state = get();
+        const exportData = {
+          questionProgress: state.questionProgress,
+          totalQuestions: state.totalQuestions,
+          masteredQuestions: state.masteredQuestions,
+          categoryProgress: state.categoryProgress,
+          studyStreak: state.studyStreak,
+          totalStudyTime: state.totalStudyTime,
+          examAttempts: state.examAttempts,
+          lastStudied: state.lastStudied,
+          exportedAt: new Date().toISOString()
+        };
+        return JSON.stringify(exportData, null, 2);
       },
-      
+
       importProgress: (data: string) => {
-        const success = ProgressPersistence.importProgress(data);
-        if (success) {
-          // Reload the store from localStorage
-          const restoredData = ProgressPersistence.restoreProgress();
-          if (restoredData) {
-            set(restoredData);
+        try {
+          const importedData = JSON.parse(data);
+          
+          if (!importedData.questionProgress) {
+            return false;
           }
+
+          // Convert date strings back to Date objects
+          Object.values(importedData.questionProgress).forEach((progress: any) => {
+            if (progress.lastAttempted) {
+              progress.lastAttempted = new Date(progress.lastAttempted);
+            }
+            if (progress.masteredAt) {
+              progress.masteredAt = new Date(progress.masteredAt);
+            }
+          });
+
+          if (importedData.examAttempts) {
+            importedData.examAttempts.forEach((attempt: any) => {
+              if (attempt.startTime) attempt.startTime = new Date(attempt.startTime);
+              if (attempt.endTime) attempt.endTime = new Date(attempt.endTime);
+            });
+          }
+
+          if (importedData.categoryProgress) {
+            Object.values(importedData.categoryProgress).forEach((category: any) => {
+              if (category.lastStudied) {
+                category.lastStudied = new Date(category.lastStudied);
+              }
+            });
+          }
+
+          if (importedData.lastStudied) {
+            importedData.lastStudied = new Date(importedData.lastStudied);
+          }
+
+          set({
+            questionProgress: importedData.questionProgress || {},
+            totalQuestions: importedData.totalQuestions || 0,
+            masteredQuestions: importedData.masteredQuestions || 0,
+            categoryProgress: importedData.categoryProgress || {},
+            studyStreak: importedData.studyStreak || 0,
+            totalStudyTime: importedData.totalStudyTime || 0,
+            examAttempts: importedData.examAttempts || [],
+            lastStudied: importedData.lastStudied
+          });
+
+          return true;
+        } catch (error) {
+          console.error('Error importing progress:', error);
+          return false;
         }
-        return success;
       },
-      
+
       getStorageStats: () => {
-        return ProgressPersistence.getStorageStats();
+        const state = get();
+        
+        return {
+          totalQuestions: Object.keys(state.questionProgress).length,
+          masteredQuestions: Object.values(state.questionProgress).filter(p => p.status === 'mastered').length,
+          bookmarkedQuestions: Object.values(state.questionProgress).filter(p => p.bookmarked).length,
+          totalStudyTime: state.totalStudyTime,
+          examAttempts: state.examAttempts.length,
+          lastStudied: state.lastStudied?.toISOString() || 'Never'
+        };
       }
     }),
     {
-      name: STORAGE_KEYS.PROGRESS,
-      partialize: (state) => ({
-        questionProgress: state.questionProgress,
-        totalQuestions: state.totalQuestions,
-        masteredQuestions: state.masteredQuestions,
-        categoryProgress: state.categoryProgress,
-        studyStreak: state.studyStreak,
-        totalStudyTime: state.totalStudyTime,
-        examAttempts: state.examAttempts,
-        lastStudied: state.lastStudied
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          console.log('✅ Progress store rehydrated successfully');
-          // Validate and backup the restored data
-          if (ProgressPersistence.validateProgressData(state)) {
-            ProgressPersistence.backupProgress(state);
-          }
-        } else {
-          console.log('ℹ️ No previous progress found - starting fresh');
-        }
-      }
+      name: 'progress-store',
+      partialize: () => ({}), // Don't persist in the store itself, use user-specific storage
     }
   )
 );
