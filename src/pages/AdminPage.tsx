@@ -72,16 +72,12 @@ const AdminPage: React.FC = () => {
       
       // Get user data from auth store
       const usersData = localStorage.getItem('aws_exam_app_users');
-      console.log('aws_exam_app_users raw data:', usersData);
       
       if (usersData && usersData !== 'null' && usersData !== '[]') {
         const users = JSON.parse(usersData);
-        console.log('Parsed users from aws_exam_app_users:', users);
         
         users.forEach((user: any) => {
           try {
-            console.log(`Processing user: ${user.id} (${user.email})`);
-            
             // Try the specific progress key patterns found in localStorage
             const possibleProgressKeys = [
               `progress-store-${user.id}`,
@@ -91,15 +87,12 @@ const AdminPage: React.FC = () => {
             ];
             
             let progressData = {};
-            let foundProgressKey = null;
             
             for (const key of possibleProgressKeys) {
               const data = localStorage.getItem(key);
               if (data && data !== 'null') {
                 try {
                   progressData = JSON.parse(data);
-                  foundProgressKey = key;
-                  console.log(`Found progress data with key: ${key}`, progressData);
                   break;
                 } catch (e) {
                   console.log(`Failed to parse data for key: ${key}`);
@@ -152,21 +145,15 @@ const AdminPage: React.FC = () => {
         });
       } else {
         // If no users in aws_exam_app_users, try to extract from progress keys directly
-        console.log('No users in aws_exam_app_users, trying to extract from progress keys...');
-        
-        // Look for progress keys that might contain user IDs
         const progressKeys = Object.keys(localStorage).filter(key => 
           key.startsWith('progress-store-') || key.startsWith('user_progress_')
         );
-        
-        console.log('Found progress keys:', progressKeys);
         
         progressKeys.forEach(key => {
           try {
             const data = localStorage.getItem(key);
             if (data && data !== 'null') {
               const progressData = JSON.parse(data);
-              console.log(`Progress data for key ${key}:`, progressData);
               
               // Extract user ID from key
               let userId = '';
@@ -233,7 +220,6 @@ const AdminPage: React.FC = () => {
         });
       }
       
-      console.log('Final userData array:', userData);
       setUsers(userData);
     } catch (err) {
       setError('Failed to load user data');
