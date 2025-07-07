@@ -93,18 +93,18 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
                   </div>
                   
                   <div className="space-y-2">
-                    {analysis.reasoning.map((reason, index) => (
+                    {(analysis.reasoning || []).map((reason, index) => (
                       <p key={index} className="text-sm text-gray-700 leading-relaxed">
                         {reason}
                       </p>
                     ))}
                   </div>
                   
-                  {analysis.key_points.services.length > 0 && (
+                  {(analysis.key_points?.services?.length || 0) > 0 && (
                     <div className="mt-3">
                       <span className="text-xs font-medium text-gray-600">AWS Services: </span>
                       <div className="inline-flex flex-wrap gap-1 mt-1">
-                        {analysis.key_points.services.map((service, index) => (
+                        {(analysis.key_points.services || []).map((service, index) => (
                           <span
                             key={index}
                             className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded"
@@ -130,14 +130,14 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
 
     return (
       <div className="space-y-4">
-        {reasoning.why_correct_answer_wins.length > 0 && (
+        {(reasoning.why_correct_answer_wins?.length || 0) > 0 && (
           <div>
             <h4 className="font-medium text-green-700 mb-2 flex items-center">
               <CheckCircle size={16} className="mr-2" />
               Why the Correct Answer Wins
             </h4>
             <ul className="space-y-1">
-              {reasoning.why_correct_answer_wins.map((insight, index) => (
+              {(reasoning.why_correct_answer_wins || []).map((insight, index) => (
                 <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
                   <span className="text-green-500 mr-2 mt-1">•</span>
                   {insight}
@@ -147,14 +147,14 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
           </div>
         )}
 
-        {reasoning.common_mistakes.length > 0 && (
+        {(reasoning.common_mistakes?.length || 0) > 0 && (
           <div>
             <h4 className="font-medium text-red-700 mb-2 flex items-center">
               <XCircle size={16} className="mr-2" />
               Common Mistakes to Avoid
             </h4>
             <ul className="space-y-1">
-              {reasoning.common_mistakes.map((mistake, index) => (
+              {(reasoning.common_mistakes || []).map((mistake, index) => (
                 <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
                   <span className="text-red-500 mr-2 mt-1">•</span>
                   {mistake}

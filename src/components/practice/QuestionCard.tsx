@@ -71,12 +71,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     
     const answer = selectedAnswers.sort().join('');
     setSubmitted(true);
-    
-    // Add temporary debugging
-    console.log('Submit successful - submitted state set to true');
-    console.log('Selected answers:', selectedAnswers);
-    console.log('Final answer:', answer);
-    
     onAnswer(answer, timeSpent);
   };
   
