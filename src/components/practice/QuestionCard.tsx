@@ -67,10 +67,20 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   };
   
   const handleSubmit = () => {
-    if (selectedAnswers.length === 0) return;
+    console.log('Submit button clicked');
+    console.log('Selected answers:', selectedAnswers);
+    
+    if (selectedAnswers.length === 0) {
+      console.log('No answers selected, returning early');
+      return;
+    }
     
     const answer = selectedAnswers.sort().join('');
+    console.log('Final answer:', answer);
+    console.log('Time spent:', timeSpent);
+    
     setSubmitted(true);
+    console.log('Calling onAnswer callback');
     onAnswer(answer, timeSpent);
   };
   
