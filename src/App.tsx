@@ -13,7 +13,6 @@ import { initializeProgressPersistence, cleanupProgressPersistence } from './uti
 // Lazy load pages for better performance
 const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ExamPage = lazy(() => import('./pages/ExamPage'));
-const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
@@ -82,14 +81,6 @@ function App() {
           <ProtectedLayout>
             <Suspense fallback={<LoadingSpinner />}>
               <ExamPage />
-            </Suspense>
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/analytics" element={
-          <ProtectedLayout>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AnalyticsPage />
             </Suspense>
           </ProtectedLayout>
         } />

@@ -16,7 +16,6 @@ const Header: React.FC = () => {
     { path: ROUTES.HOME, label: 'Dashboard', icon: Home },
     { path: ROUTES.PRACTICE, label: 'Practice', icon: BookOpen },
     { path: ROUTES.EXAM, label: 'Exam Sim', icon: Clock },
-    { path: ROUTES.ANALYTICS, label: 'Analytics', icon: BarChart3 },
     { path: ROUTES.SERVICES, label: 'Services & Guide', icon: Cloud },
     { path: ROUTES.SETTINGS, label: 'Settings', icon: Settings },
   ];

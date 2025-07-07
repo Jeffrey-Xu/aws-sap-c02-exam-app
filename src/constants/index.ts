@@ -39,7 +39,6 @@ export const ROUTES = {
   HOME: '/',
   PRACTICE: '/practice',
   EXAM: '/exam',
-  ANALYTICS: '/analytics',
   SERVICES: '/services',
   SETTINGS: '/settings',
 } as const;

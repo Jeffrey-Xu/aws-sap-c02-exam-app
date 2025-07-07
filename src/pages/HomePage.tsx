@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle } from 'lucide-react';
+import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle, Clock, TrendingUp } from 'lucide-react';
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
 import { useQuestionStore } from '../stores/questionStore';
 import { useProgressStore } from '../stores/progressStore';
 import { ROUTES, DOMAIN_INFO } from '../constants';
-import { calculateReadinessScore, safePercentage, safeNumber } from '../utils/questionUtils';
+import { calculateReadinessScore, safePercentage, safeNumber, formatTime } from '../utils/questionUtils';
 import type { QuestionStatus } from '../types';
 
 const HomePage: React.FC = () => {
@@ -18,7 +18,8 @@ const HomePage: React.FC = () => {
     studyStreak,
     examAttempts,
     calculateProgress,
-    questionProgress
+    questionProgress,
+    totalStudyTime
   } = useProgressStore();
   
   // Calculate status statistics
@@ -148,6 +149,44 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </Card>
+      
+      {/* Enhanced Analytics Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-6 text-center">
+          <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+          <div className="text-2xl font-bold text-gray-900">{formatTime(totalStudyTime)}</div>
+          <div className="text-sm text-gray-600 mb-2">Total Study Time</div>
+          <div className="text-xs text-gray-500">
+            {totalStudyTime > 0 ? `${Math.round(totalStudyTime / 3600)} hours of focused study` : 'Start studying to track time'}
+          </div>
+        </Card>
+        
+        <Card className="p-6 text-center">
+          <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-3" />
+          <div className="text-2xl font-bold text-gray-900">
+            {Object.values(questionProgress).length > 0 ? 
+              Math.round(Object.values(questionProgress).reduce((sum, p) => sum + (p.correctAttempts / Math.max(p.attempts, 1)), 0) / Object.values(questionProgress).length * 100) : 0}%
+          </div>
+          <div className="text-sm text-gray-600 mb-2">Overall Accuracy</div>
+          <div className="text-xs text-gray-500">
+            Average success rate across all attempts
+          </div>
+        </Card>
+        
+        <Card className="p-6 text-center">
+          <Target className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+          <div className="text-2xl font-bold text-gray-900">
+            {Object.keys(categoryProgress).filter(domain => {
+              const progress = categoryProgress[domain as keyof typeof categoryProgress];
+              return progress && progress.masteredQuestions > 0;
+            }).length}
+          </div>
+          <div className="text-sm text-gray-600 mb-2">Active Domains</div>
+          <div className="text-xs text-gray-500">
+            Domains with mastered questions
+          </div>
+        </Card>
+      </div>
       
       {/* Question Status Overview */}
       <Card>
