@@ -9,8 +9,7 @@ interface DetailedExplanationProps {
 
 const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, userAnswer }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    overview: true,
-    optionAnalysis: false,
+    optionAnalysis: true, // Make this expanded by default since Overview is removed
     keyInsights: false,
     awsServices: false
   });
@@ -59,13 +58,15 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
 
     return (
       <div className="space-y-4">
-        {Object.entries(question.detailed_reasoning.option_analyses).map(([letter, analysis]) => {
+        {Object.entries(question.detailed_reasoning.option_analyses).map(([key, analysis], index) => {
+          // Convert numeric keys to letters (0->A, 1->B, etc.) or use existing letter keys
+          const letter = isNaN(parseInt(key)) ? key : String.fromCharCode(65 + parseInt(key));
           const isUserAnswer = userAnswer === letter;
           const isCorrect = analysis.is_correct;
           
           return (
             <div
-              key={letter}
+              key={key}
               className={`border rounded-lg p-4 ${
                 isCorrect 
                   ? 'border-green-200 bg-green-50' 
@@ -240,41 +241,13 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
       <h3 className="text-xl font-semibold text-gray-900 mb-6">Detailed Explanation</h3>
       
       <div className="space-y-4">
-        {/* Overview Section */}
-        {renderCollapsibleSection(
-          'overview',
-          'Overview & Basic Explanation',
-          <BookOpen size={18} className="text-blue-600" />,
-          <div className="space-y-4">
-            <div>
-              <p className="text-gray-700 leading-relaxed">{question.explanation}</p>
-            </div>
-            <div>
-              <h4 className="font-medium text-green-700 mb-2">✅ Why the correct answer is right:</h4>
-              <p className="text-gray-700 leading-relaxed">{question.why_correct}</p>
-            </div>
-            {question.why_others_wrong.length > 0 && (
-              <div>
-                <h4 className="font-medium text-red-700 mb-2">❌ Why other options are wrong:</h4>
-                <ul className="space-y-2">
-                  {question.why_others_wrong.map((explanation, index) => (
-                    <li key={index} className="text-gray-700 leading-relaxed">
-                      • {explanation}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>,
-          true
-        )}
-
         {/* Detailed Option Analysis */}
         {question.detailed_reasoning?.option_analyses && renderCollapsibleSection(
           'optionAnalysis',
           'Detailed Option Analysis',
           <CheckCircle size={18} className="text-green-600" />,
-          renderOptionAnalysis()
+          renderOptionAnalysis(),
+          true // Make this expanded by default since Overview is removed
         )}
 
         {/* Key Insights */}
