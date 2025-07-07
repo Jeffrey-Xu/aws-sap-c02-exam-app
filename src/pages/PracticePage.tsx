@@ -56,19 +56,10 @@ const PracticePage: React.FC = () => {
   const currentQuestion = filteredQuestions[currentQuestionIndex];
   
   const handleAnswer = (answer: string, timeSpent: number) => {
-    console.log('handleAnswer called with:', { answer, timeSpent });
+    if (!currentQuestion) return;
     
-    if (!currentQuestion) {
-      console.log('No current question, returning early');
-      return;
-    }
-    
-    console.log('Current question correct answer:', currentQuestion.correct_answer);
     const isCorrect = answer === currentQuestion.correct_answer;
-    console.log('Is answer correct?', isCorrect);
-    
     updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent);
-    console.log('Setting showExplanation to true');
     setShowExplanation(true);
   };
   

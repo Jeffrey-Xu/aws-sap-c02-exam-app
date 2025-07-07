@@ -53,45 +53,24 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [question.id]);
   
   const handleOptionSelect = (letter: string) => {
-    console.log('Option selected:', letter);
-    console.log('Currently submitted:', submitted);
-    
-    if (submitted) {
-      console.log('Already submitted, ignoring selection');
-      return;
-    }
+    if (submitted) return;
     
     if (isMultiple) {
-      console.log('Multiple choice question');
-      setSelectedAnswers(prev => {
-        const newAnswers = prev.includes(letter) 
+      setSelectedAnswers(prev => 
+        prev.includes(letter) 
           ? prev.filter(a => a !== letter)
-          : [...prev, letter];
-        console.log('New selected answers:', newAnswers);
-        return newAnswers;
-      });
+          : [...prev, letter]
+      );
     } else {
-      console.log('Single choice question');
       setSelectedAnswers([letter]);
-      console.log('Selected answer set to:', [letter]);
     }
   };
   
   const handleSubmit = () => {
-    console.log('Submit button clicked');
-    console.log('Selected answers:', selectedAnswers);
-    
-    if (selectedAnswers.length === 0) {
-      console.log('No answers selected, returning early');
-      return;
-    }
+    if (selectedAnswers.length === 0) return;
     
     const answer = selectedAnswers.sort().join('');
-    console.log('Final answer:', answer);
-    console.log('Time spent:', timeSpent);
-    
     setSubmitted(true);
-    console.log('Calling onAnswer callback');
     onAnswer(answer, timeSpent);
   };
   
