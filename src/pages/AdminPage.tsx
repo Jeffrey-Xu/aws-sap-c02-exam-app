@@ -71,66 +71,75 @@ const AdminPage: React.FC = () => {
   const loadUserData = () => {
     setLoading(true);
     try {
-      // Get all user data from localStorage
       const userData: UserMetrics[] = [];
       
-      // Iterate through localStorage to find user progress data
+      // Debug: Log all localStorage keys
+      console.log('All localStorage keys:');
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith('user_progress_')) {
-          try {
-            const userId = key.replace('user_progress_', '');
-            const progressData = JSON.parse(localStorage.getItem(key) || '{}');
-            
-            // Calculate metrics from progress data
-            const totalQuestions = progressData.totalQuestions || 0;
-            const masteredQuestions = progressData.masteredQuestions || 0;
-            const studyTime = progressData.totalStudyTime || 0;
-            const examAttempts = progressData.examAttempts?.length || 0;
-            const studyStreak = progressData.studyStreak || 0;
-            
-            // Calculate average score from exam attempts
-            let averageScore = 0;
-            if (progressData.examAttempts && progressData.examAttempts.length > 0) {
-              const totalScore = progressData.examAttempts.reduce((sum: number, attempt: any) => 
-                sum + (attempt.score?.percentage || 0), 0);
-              averageScore = Math.round(totalScore / progressData.examAttempts.length);
-            }
-            
-            // Calculate readiness score
-            const readinessScore = totalQuestions > 0 ? 
-              Math.round((masteredQuestions / totalQuestions) * 100) : 0;
-            
-            // Get user auth data
-            const authKey = `user_auth_${userId}`;
-            const authData = JSON.parse(localStorage.getItem(authKey) || '{}');
-            
-            // Determine last active time
-            const lastActive = progressData.lastStudied || 
-                             authData.lastLogin || 
-                             authData.createdAt || 
-                             new Date().toISOString();
-            
-            userData.push({
-              userId,
-              email: authData.email || `user_${userId}@example.com`,
-              registrationDate: authData.createdAt || new Date().toISOString(),
-              lastActive,
-              totalQuestions,
-              masteredQuestions,
-              studyTime,
-              examAttempts,
-              averageScore,
-              studyStreak,
-              readinessScore,
-              isActive: new Date(lastActive) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Active in last 7 days
-            });
-          } catch (err) {
-            console.error('Error parsing user data:', err);
-          }
-        }
+        console.log(`  ${i}: ${key}`);
       }
       
+      // Get real user data from auth store
+      const usersData = localStorage.getItem('aws_exam_app_users');
+      const users = usersData ? JSON.parse(usersData) : [];
+      
+      console.log('Found users in storage:', users.length); // Debug log
+      console.log('Users data:', users); // Debug log
+      
+      users.forEach((user: any) => {
+        try {
+          // Get progress data for this user
+          const progressKey = `progress-store-${user.id}`;
+          const progressData = JSON.parse(localStorage.getItem(progressKey) || '{}');
+          
+          console.log(`User ${user.id} (${user.email}) progress:`, progressData); // Debug log
+          
+          // Calculate metrics from progress data
+          const totalQuestions = progressData.totalQuestions || 0;
+          const masteredQuestions = progressData.masteredQuestions || 0;
+          const studyTime = progressData.totalStudyTime || 0;
+          const examAttempts = progressData.examAttempts?.length || 0;
+          const studyStreak = progressData.studyStreak || 0;
+          
+          // Calculate average score from exam attempts
+          let averageScore = 0;
+          if (progressData.examAttempts && progressData.examAttempts.length > 0) {
+            const totalScore = progressData.examAttempts.reduce((sum: number, attempt: any) => 
+              sum + (attempt.score?.percentage || 0), 0);
+            averageScore = Math.round(totalScore / progressData.examAttempts.length);
+          }
+          
+          // Calculate readiness score
+          const readinessScore = totalQuestions > 0 ? 
+            Math.round((masteredQuestions / totalQuestions) * 100) : 0;
+          
+          // Determine last active time
+          const lastActive = progressData.lastStudied || 
+                           user.lastLoginAt || 
+                           user.createdAt || 
+                           new Date().toISOString();
+          
+          userData.push({
+            userId: user.id,
+            email: user.email,
+            registrationDate: user.createdAt || new Date().toISOString(),
+            lastActive,
+            totalQuestions,
+            masteredQuestions,
+            studyTime,
+            examAttempts,
+            averageScore,
+            studyStreak,
+            readinessScore,
+            isActive: new Date(lastActive) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Active in last 7 days
+          });
+        } catch (err) {
+          console.error('Error parsing user data for user:', user.id, err);
+        }
+      });
+      
+      console.log('Final processed user data:', userData); // Debug log
       setUsers(userData);
     } catch (err) {
       setError('Failed to load user data');
