@@ -36,13 +36,13 @@ export const DOMAIN_INFO: Record<ExamDomain, { name: string; percentage: number;
 } as const;
 
 export const ROUTES = {
-  HOME: '/',
-  PRACTICE: '/practice',
-  EXAM: '/exam',
-  ANALYTICS: '/analytics',
-  SERVICES: '/services',
-  ARCHITECT: '/architect',
-  SETTINGS: '/settings',
+  HOME: '/dashboard',
+  PRACTICE: '/dashboard/practice',
+  EXAM: '/dashboard/exam',
+  ANALYTICS: '/dashboard/analytics',
+  SERVICES: '/dashboard/services',
+  ARCHITECT: '/dashboard/architect',
+  SETTINGS: '/dashboard/settings',
 } as const;
 
 export const STORAGE_KEYS = {

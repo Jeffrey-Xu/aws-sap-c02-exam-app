@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Download, Trash2, Upload, Database, Shield, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Download, Trash2, Upload, User, Mail, Shield, RotateCcw, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import DataManagement from '../components/settings/DataManagement';
 import { useProgressStore } from '../stores/progressStore';
+import { useAuthStore } from '../stores/authStore';
 import { useExamStore } from '../stores/examStore';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
 import { ROUTES } from '../constants';
@@ -22,12 +22,24 @@ const SettingsPage: React.FC = () => {
   } = useProgressStore();
   
   const { 
+    user,
+    updateProfile,
+    deleteAccount,
+    logout
+  } = useAuthStore();
+  
+  const { 
     currentSession, 
     resetExam 
   } = useExamStore();
   
   const [importFile, setImportFile] = useState<File | null>(null);
   const [storageStats, setStorageStats] = useState<any>(null);
+  const [profileData, setProfileData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || ''
+  });
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   
   // Custom dialog hook
   const { dialogState, showDialog, hideDialog } = useConfirmDialog();
@@ -35,12 +47,71 @@ const SettingsPage: React.FC = () => {
   React.useEffect(() => {
     setStorageStats(getStorageStats());
   }, [getStorageStats]);
+
+  React.useEffect(() => {
+    if (user) {
+      setProfileData({
+        firstName: user.firstName,
+        lastName: user.lastName
+      });
+    }
+  }, [user]);
+  
+  const handleUpdateProfile = async () => {
+    if (!profileData.firstName.trim() || !profileData.lastName.trim()) {
+      alert('Please enter both first and last name.');
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+    const success = await updateProfile({
+      firstName: profileData.firstName.trim(),
+      lastName: profileData.lastName.trim()
+    });
+
+    if (success) {
+      showDialog(
+        {
+          title: 'Success',
+          message: 'Profile updated successfully.',
+          type: 'success',
+          confirmText: 'OK',
+          cancelText: ''
+        },
+        () => {}
+      );
+    } else {
+      alert('Failed to update profile. Please try again.');
+    }
+    setIsUpdatingProfile(false);
+  };
+
+  const handleDeleteAccount = () => {
+    showDialog(
+      {
+        title: 'Delete Account',
+        message: 'Are you sure you want to delete your account? This will permanently remove all your data and cannot be undone.',
+        type: 'danger',
+        confirmText: 'Delete Account',
+        cancelText: 'Cancel',
+        confirmVariant: 'danger'
+      },
+      async () => {
+        const success = await deleteAccount();
+        if (success) {
+          // User will be automatically logged out and redirected
+        } else {
+          alert('Failed to delete account. Please try again.');
+        }
+      }
+    );
+  };
   
   const handleResetProgress = () => {
     showDialog(
       {
-        title: 'Reset All Progress',
-        message: 'Are you sure you want to reset all progress? This action cannot be undone.',
+        title: 'Reset Study Progress',
+        message: 'Are you sure you want to reset all your study progress? This action cannot be undone.',
         type: 'warning',
         confirmText: 'Reset Progress',
         cancelText: 'Cancel',
@@ -51,7 +122,7 @@ const SettingsPage: React.FC = () => {
         showDialog(
           {
             title: 'Success',
-            message: 'Progress has been reset successfully.',
+            message: 'Study progress has been reset successfully.',
             type: 'success',
             confirmText: 'OK',
             cancelText: ''
@@ -96,7 +167,7 @@ const SettingsPage: React.FC = () => {
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `aws-sap-c02-progress-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `aws-sap-c02-progress-${user?.firstName}-${new Date().toISOString().split('T')[0]}.json`;
       link.click();
       
       URL.revokeObjectURL(url);
@@ -146,18 +217,95 @@ const SettingsPage: React.FC = () => {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Manage your exam preparation preferences</p>
+          <p className="text-gray-600">Manage your account and study preferences</p>
         </div>
       </div>
-      
-      {/* Progress Management */}
+
+      {/* User Profile */}
       <Card>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress Management</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <User className="w-5 h-5 mr-2" />
+          Profile Information
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                First Name
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={profileData.firstName}
+                onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-aws-orange focus:border-aws-orange"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                value={profileData.lastName}
+                onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-aws-orange focus:border-aws-orange"
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+              <Mail className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-700">{user?.email}</span>
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Verified</span>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleUpdateProfile}
+              disabled={isUpdatingProfile}
+              className="flex items-center"
+            >
+              <Save size={16} className="mr-2" />
+              {isUpdatingProfile ? 'Updating...' : 'Update Profile'}
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Study Progress Management */}
+      <Card>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{totalQuestions}</div>
+            <div className="text-sm text-gray-600">Questions Attempted</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">{masteredQuestions}</div>
+            <div className="text-sm text-gray-600">Questions Mastered</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600">
+              {Math.floor(totalStudyTime / 3600)}h {Math.floor((totalStudyTime % 3600) / 60)}m
+            </div>
+            <div className="text-sm text-gray-600">Total Study Time</div>
+          </div>
+        </div>
+
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
             <div>
               <div className="font-medium text-gray-900">Export Progress</div>
-              <div className="text-sm text-gray-600">Download your complete study progress as a backup file</div>
+              <div className="text-sm text-gray-600">Download your study progress as a backup file</div>
             </div>
             <Button variant="outline" onClick={handleExportProgress}>
               <Download size={16} className="mr-1" />
@@ -189,7 +337,6 @@ const SettingsPage: React.FC = () => {
             </Button>
           </div>
           
-          
           {/* Reset Current Exam */}
           {currentSession && (
             <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
@@ -210,7 +357,7 @@ const SettingsPage: React.FC = () => {
           
           <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
             <div>
-              <div className="font-medium text-gray-900">Reset Progress</div>
+              <div className="font-medium text-gray-900">Reset All Progress</div>
               <div className="text-sm text-gray-600">Clear all study progress and start fresh</div>
             </div>
             <Button 
@@ -224,105 +371,80 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </Card>
-      
-      {/* Storage Information */}
-      {storageStats && (
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Storage Information</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <Database className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-              <div className="text-lg font-bold text-gray-900">
-                {Math.round(storageStats.progressSize / 1024)}KB
-              </div>
-              <div className="text-sm text-gray-600">Progress Data</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <Shield className="w-8 h-8 text-green-500 mx-auto mb-2" />
-              <div className="text-lg font-bold text-gray-900">{storageStats.backupCount}</div>
-              <div className="text-sm text-gray-600">Backup Copies</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-lg font-bold text-gray-900">
-                {Math.round(storageStats.used / 1024)}KB
-              </div>
-              <div className="text-sm text-gray-600">Total Used</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-lg font-bold text-gray-900">
-                {Math.round(storageStats.available / 1024)}KB
-              </div>
-              <div className="text-sm text-gray-600">Available</div>
-            </div>
-          </div>
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <div className="text-sm text-blue-800">
-              <strong>Auto-backup:</strong> Your progress is automatically backed up every 30 seconds and when you close the app.
-              Multiple backup copies are maintained for data safety.
-            </div>
-          </div>
-        </Card>
-      )}
-      
-      {/* Study Statistics */}
+
+      {/* Account Management */}
       <Card>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Statistics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-gray-900">{totalQuestions}</div>
-            <div className="text-sm text-gray-600">Total Questions</div>
-          </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-gray-900">{masteredQuestions}</div>
-            <div className="text-sm text-gray-600">Questions Mastered</div>
-          </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-gray-900">
-              {Math.floor(totalStudyTime / 3600)}h {Math.floor((totalStudyTime % 3600) / 60)}m
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <Shield className="w-5 h-5 mr-2" />
+          Account Management
+        </h3>
+        <div className="space-y-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="font-medium text-gray-900">Account Created</div>
+                <div className="text-sm text-gray-600">
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium text-gray-900">Last Login</div>
+                <div className="text-sm text-gray-600">
+                  {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Unknown'}
+                </div>
+              </div>
             </div>
-            <div className="text-sm text-gray-600">Total Study Time</div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-red-900">Delete Account</h4>
+                  <p className="text-sm text-red-700 mt-1">
+                    Permanently delete your account and all associated data. This action cannot be undone.
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={handleDeleteAccount}
+                  className="text-red-600 border-red-300 hover:bg-red-50 ml-4"
+                >
+                  <Trash2 size={16} className="mr-1" />
+                  Delete Account
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
-      
+
       {/* Application Info */}
       <Card>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Application Information</h3>
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Version</span>
-            <span className="font-medium">1.0.0</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-lg font-bold text-gray-900">529</div>
+            <div className="text-sm text-gray-600">Total Questions</div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Question Bank</span>
-            <span className="font-medium">529 Questions</span>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-lg font-bold text-gray-900">5</div>
+            <div className="text-sm text-gray-600">Exam Domains</div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Exam</span>
-            <span className="font-medium">AWS SAP-C02</span>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-lg font-bold text-gray-900">20</div>
+            <div className="text-sm text-gray-600">Max Users</div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Last Updated</span>
-            <span className="font-medium">{new Date().toLocaleDateString()}</span>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-lg font-bold text-gray-900">v2.0</div>
+            <div className="text-sm text-gray-600">Version</div>
           </div>
         </div>
-      </Card>
-      
-      {/* Data Management */}
-      <DataManagement />
-      
-      {/* About */}
-      <Card>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
-        <div className="prose prose-sm text-gray-600">
-          <p>
-            This application is designed to help you prepare for the AWS Solutions Architect Professional (SAP-C02) certification exam. 
-            It includes practice questions, full exam simulation, and detailed analytics to track your progress.
-          </p>
-          <p className="mt-3">
-            The question bank contains 529 carefully curated questions with detailed explanations to help you understand 
-            AWS services and architectural best practices.
-          </p>
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+          <div className="text-sm text-blue-800">
+            <strong>AWS SAP-C02 Exam Prep</strong> - Comprehensive preparation platform for the 
+            AWS Solutions Architect Professional certification with detailed explanations and progress tracking.
+          </div>
         </div>
       </Card>
       
