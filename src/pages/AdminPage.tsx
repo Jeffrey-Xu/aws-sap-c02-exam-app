@@ -70,47 +70,24 @@ const AdminPage: React.FC = () => {
     try {
       const userData: UserMetrics[] = [];
       
-      // Debug: Log all localStorage keys to see what's actually stored
-      console.log('=== DEBUGGING LOCALSTORAGE ===');
-      console.log('Total localStorage items:', localStorage.length);
-      
-      const allKeys: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key) {
-          allKeys.push(key);
-          console.log(`${i}: ${key}`);
-        }
-      }
-      
-      // Check for different possible user storage patterns
-      const userKeys = allKeys.filter(key => 
-        key.includes('user') || 
-        key.includes('auth') || 
-        key.includes('progress') ||
-        key.includes('aws_exam_app')
-      );
-      
-      console.log('User-related keys found:', userKeys);
-      
-      // Try the expected auth store key
+      // Get user data from auth store
       const usersData = localStorage.getItem('aws_exam_app_users');
-      console.log('aws_exam_app_users data:', usersData);
+      console.log('aws_exam_app_users raw data:', usersData);
       
-      if (usersData) {
+      if (usersData && usersData !== 'null' && usersData !== '[]') {
         const users = JSON.parse(usersData);
-        console.log('Parsed users:', users);
+        console.log('Parsed users from aws_exam_app_users:', users);
         
         users.forEach((user: any) => {
           try {
             console.log(`Processing user: ${user.id} (${user.email})`);
             
-            // Try different possible progress key patterns
+            // Try the specific progress key patterns found in localStorage
             const possibleProgressKeys = [
               `progress-store-${user.id}`,
               `user_progress_${user.id}`,
-              `aws_exam_app_progress_${user.id}`,
-              user.id // Sometimes the user ID itself might be the key
+              `progress-store-user_${user.id}`,
+              `user_progress_user_${user.id}`
             ];
             
             let progressData = {};
@@ -118,7 +95,7 @@ const AdminPage: React.FC = () => {
             
             for (const key of possibleProgressKeys) {
               const data = localStorage.getItem(key);
-              if (data) {
+              if (data && data !== 'null') {
                 try {
                   progressData = JSON.parse(data);
                   foundProgressKey = key;
@@ -128,10 +105,6 @@ const AdminPage: React.FC = () => {
                   console.log(`Failed to parse data for key: ${key}`);
                 }
               }
-            }
-            
-            if (!foundProgressKey) {
-              console.log(`No progress data found for user ${user.id}`);
             }
             
             // Calculate metrics from progress data
@@ -174,32 +147,90 @@ const AdminPage: React.FC = () => {
               isActive: new Date(lastActive) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
             });
           } catch (err) {
-            console.error('Error parsing user data for user:', user.id, err);
+            console.error('Error parsing user data for user:', user?.id, err);
           }
         });
       } else {
-        // If no users found in expected location, try alternative storage patterns
-        console.log('No users found in aws_exam_app_users, checking alternatives...');
+        // If no users in aws_exam_app_users, try to extract from progress keys directly
+        console.log('No users in aws_exam_app_users, trying to extract from progress keys...');
         
-        // Check for Zustand persist storage
-        const zustandKeys = allKeys.filter(key => key.includes('zustand') || key.includes('persist'));
-        console.log('Zustand/persist keys:', zustandKeys);
+        // Look for progress keys that might contain user IDs
+        const progressKeys = Object.keys(localStorage).filter(key => 
+          key.startsWith('progress-store-') || key.startsWith('user_progress_')
+        );
         
-        // Check for session storage
-        const sessionKey = localStorage.getItem('aws_exam_app_session');
-        console.log('Session data:', sessionKey);
+        console.log('Found progress keys:', progressKeys);
         
-        // Try to find any user-like data
-        for (const key of userKeys) {
+        progressKeys.forEach(key => {
           try {
             const data = localStorage.getItem(key);
-            if (data) {
-              console.log(`Data for key ${key}:`, JSON.parse(data));
+            if (data && data !== 'null') {
+              const progressData = JSON.parse(data);
+              console.log(`Progress data for key ${key}:`, progressData);
+              
+              // Extract user ID from key
+              let userId = '';
+              if (key.startsWith('progress-store-')) {
+                userId = key.replace('progress-store-', '');
+              } else if (key.startsWith('user_progress_')) {
+                userId = key.replace('user_progress_', '');
+              }
+              
+              // Try to get user info from session or create placeholder
+              const sessionData = localStorage.getItem('aws_exam_app_session');
+              let userEmail = `user_${userId.substring(0, 8)}@example.com`;
+              let registrationDate = new Date().toISOString();
+              
+              if (sessionData) {
+                try {
+                  const session = JSON.parse(sessionData);
+                  if (session.state?.user) {
+                    userEmail = session.state.user.email || userEmail;
+                    registrationDate = session.state.user.createdAt || registrationDate;
+                  }
+                } catch (e) {
+                  console.log('Failed to parse session data');
+                }
+              }
+              
+              // Calculate metrics
+              const totalQuestions = progressData.totalQuestions || 0;
+              const masteredQuestions = progressData.masteredQuestions || 0;
+              const studyTime = progressData.totalStudyTime || 0;
+              const examAttempts = progressData.examAttempts?.length || 0;
+              const studyStreak = progressData.studyStreak || 0;
+              
+              let averageScore = 0;
+              if (progressData.examAttempts && progressData.examAttempts.length > 0) {
+                const totalScore = progressData.examAttempts.reduce((sum: number, attempt: any) => 
+                  sum + (attempt.score?.percentage || 0), 0);
+                averageScore = Math.round(totalScore / progressData.examAttempts.length);
+              }
+              
+              const readinessScore = totalQuestions > 0 ? 
+                Math.round((masteredQuestions / totalQuestions) * 100) : 0;
+              
+              const lastActive = progressData.lastStudied || registrationDate;
+              
+              userData.push({
+                userId,
+                email: userEmail,
+                registrationDate,
+                lastActive,
+                totalQuestions,
+                masteredQuestions,
+                studyTime,
+                examAttempts,
+                averageScore,
+                studyStreak,
+                readinessScore,
+                isActive: new Date(lastActive) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+              });
             }
-          } catch (e) {
-            console.log(`Failed to parse data for key: ${key}`);
+          } catch (err) {
+            console.error('Error parsing progress data for key:', key, err);
           }
-        }
+        });
       }
       
       console.log('Final userData array:', userData);
