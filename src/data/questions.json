@@ -13,7 +13,7 @@
       },
       {
         "letter": "C",
-        "text": "Associate the private hosted zone to the shared services VPCreate a Route 53 outbound resolver in the shared services VPAttach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the outbound resolver."
+        "text": "Associate the private hosted zone to the shared services VPC. Create a Route 53 outbound resolver in the shared services VPC. Attach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the outbound resolver."
       },
       {
         "letter": "D",
@@ -66,7 +66,7 @@
         },
         {
           "letter": "C",
-          "text": "Associate the private hosted zone to the shared services VPCreate a Route 53 outbound resolver in the shared services VPAttach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the outbound resolver.",
+          "text": "Associate the private hosted zone to the shared services VPC. Create a Route 53 outbound resolver in the shared services VPC. Attach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the outbound resolver.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -1249,7 +1249,7 @@
       },
       {
         "letter": "B",
-        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target.FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server."
+        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target. FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server."
       },
       {
         "letter": "C",
@@ -1257,7 +1257,7 @@
       },
       {
         "letter": "D",
-        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb.InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server."
+        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb. InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server."
       },
       {
         "letter": "E",
@@ -1297,7 +1297,7 @@
         },
         {
           "letter": "B",
-          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target.FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server.",
+          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target. FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -1329,7 +1329,7 @@
         },
         {
           "letter": "D",
-          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb.InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server.",
+          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb. InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -5219,7 +5219,7 @@
       },
       {
         "letter": "C",
-        "text": "Set up an S3 gateway VPC endpoint in the VPAttach an endpoint policy to the endpoint to allow the required actions on the S3 bucket."
+        "text": "Set up an S3 gateway VPC endpoint in the VPC. Attach an endpoint policy to the endpoint to allow the required actions on the S3 bucket."
       },
       {
         "letter": "D",
@@ -5273,7 +5273,7 @@
         },
         {
           "letter": "C",
-          "text": "Set up an S3 gateway VPC endpoint in the VPAttach an endpoint policy to the endpoint to allow the required actions on the S3 bucket.",
+          "text": "Set up an S3 gateway VPC endpoint in the VPC. Attach an endpoint policy to the endpoint to allow the required actions on the S3 bucket.",
           "is_correct": true,
           "reasoning": [
             "✅ Uses proper IAM roles and policies for secure access",
@@ -7873,7 +7873,7 @@
       },
       {
         "letter": "D",
-        "text": "Configure AWS CodeDeploy and use CodeDeployDefault.OneAtATime in the Deployment configuration to distribute the load."
+        "text": "Configure AWS CodeDeploy and use CodeDeployDefault. OneAtATime in the Deployment configuration to distribute the load."
       }
     ],
     "option_count": 4,
@@ -7939,7 +7939,7 @@
         },
         {
           "letter": "D",
-          "text": "Configure AWS CodeDeploy and use CodeDeployDefault.OneAtATime in the Deployment configuration to distribute the load.",
+          "text": "Configure AWS CodeDeploy and use CodeDeployDefault. OneAtATime in the Deployment configuration to distribute the load.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -9088,7 +9088,7 @@
       },
       {
         "letter": "C",
-        "text": "Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPCreate an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPPlace the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPCreate an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks and configure a failover routing policy for each record."
+        "text": "Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPC. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPC. Place the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPC. Create an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks and configure a failover routing policy for each record."
       },
       {
         "letter": "D",
@@ -9151,7 +9151,7 @@
         },
         {
           "letter": "C",
-          "text": "Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPCreate an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPPlace the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPCreate an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks and configure a failover routing policy for each record.",
+          "text": "Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPC. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPC. Place the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPC. Create an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks and configure a failover routing policy for each record.",
           "is_correct": true,
           "reasoning": [
             "✅ Ensures high availability through Multi-AZ deployment",
@@ -18867,7 +18867,7 @@
       },
       {
         "letter": "C",
-        "text": "Update the API endpoint from Regional to private in API Gateway. Create an interface VPC endpoint in the VPCreate a resource policy, and attach it to the API. Use the VPC endpoint to call the API from the VPC."
+        "text": "Update the API endpoint from Regional to private in API Gateway. Create an interface VPC endpoint in the VPC. Create a resource policy, and attach it to the API. Use the VPC endpoint to call the API from the VPC."
       },
       {
         "letter": "D",
@@ -18923,7 +18923,7 @@
         },
         {
           "letter": "C",
-          "text": "Update the API endpoint from Regional to private in API Gateway. Create an interface VPC endpoint in the VPCreate a resource policy, and attach it to the API. Use the VPC endpoint to call the API from the VPC.",
+          "text": "Update the API endpoint from Regional to private in API Gateway. Create an interface VPC endpoint in the VPC. Create a resource policy, and attach it to the API. Use the VPC endpoint to call the API from the VPC.",
           "is_correct": true,
           "reasoning": [
             "✅ Uses proper IAM roles and policies for secure access",
@@ -32447,7 +32447,7 @@
       },
       {
         "letter": "C",
-        "text": "Create a gateway endpoint for Amazon S3 in each application's VPConfigure the endpoint policy to allow access to an S3 access point. Specify the route table that is used to access the access point."
+        "text": "Create a gateway endpoint for Amazon S3 in each application's VPC. Configure the endpoint policy to allow access to an S3 access point. Specify the route table that is used to access the access point."
       },
       {
         "letter": "D",
@@ -32507,7 +32507,7 @@
         },
         {
           "letter": "C",
-          "text": "Create a gateway endpoint for Amazon S3 in each application's VPConfigure the endpoint policy to allow access to an S3 access point. Specify the route table that is used to access the access point.",
+          "text": "Create a gateway endpoint for Amazon S3 in each application's VPC. Configure the endpoint policy to allow access to an S3 access point. Specify the route table that is used to access the access point.",
           "is_correct": true,
           "reasoning": [
             "✅ Uses proper IAM roles and policies for secure access",
@@ -37007,7 +37007,7 @@
       },
       {
         "letter": "F",
-        "text": "Add a Catch field to all Task, Map, and Parallel states that have a statement of \"ErrorEquals\": [ \"States.Runtime\" ] and \"Next\": \"Email\"."
+        "text": "Add a Catch field to all Task, Map, and Parallel states that have a statement of \"ErrorEquals\": [ \"States. Runtime\" ] and \"Next\": \"Email\"."
       }
     ],
     "option_count": 6,
@@ -37101,7 +37101,7 @@
         },
         {
           "letter": "F",
-          "text": "Add a Catch field to all Task, Map, and Parallel states that have a statement of \"ErrorEquals\": [ \"States.Runtime\" ] and \"Next\": \"Email\".",
+          "text": "Add a Catch field to all Task, Map, and Parallel states that have a statement of \"ErrorEquals\": [ \"States. Runtime\" ] and \"Next\": \"Email\".",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -37157,7 +37157,7 @@
       },
       {
         "letter": "C",
-        "text": "Turn on DNS hostnames for the VPConfigure a new inbound resolver endpoint with Amazon Route 53 Resolver. Configur&the on-premises DNS server to forward requests for company.example to the new resolver."
+        "text": "Turn on DNS hostnames for the VPC. Configure a new inbound resolver endpoint with Amazon Route 53 Resolver. Configurethe on-premises DNS server to forward requests for company.example to the new resolver."
       },
       {
         "letter": "D",
@@ -37208,7 +37208,7 @@
         },
         {
           "letter": "C",
-          "text": "Turn on DNS hostnames for the VPConfigure a new inbound resolver endpoint with Amazon Route 53 Resolver. Configur&the on-premises DNS server to forward requests for company.example to the new resolver.",
+          "text": "Turn on DNS hostnames for the VPC. Configure a new inbound resolver endpoint with Amazon Route 53 Resolver. Configurethe on-premises DNS server to forward requests for company.example to the new resolver.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -40484,7 +40484,7 @@
       },
       {
         "letter": "C",
-        "text": "Deactivate the enableDnsSupport attribute for the VPActivate the enableDnsHostnames attribute for the VPCreate a new VPC DHCP options set, and configure doman-name-servers=10.24.34.2. Associate the new DHCP options set with the VPC."
+        "text": "Deactivate the enableDnsSupport attribute for the VPC. Activate the enableDnsHostnames attribute for the VPC. Create a new VPC DHCP options set, and configure doman-name-servers=10.24.34.2. Associate the new DHCP options set with the VPC."
       },
       {
         "letter": "D",
@@ -40535,7 +40535,7 @@
         },
         {
           "letter": "C",
-          "text": "Deactivate the enableDnsSupport attribute for the VPActivate the enableDnsHostnames attribute for the VPCreate a new VPC DHCP options set, and configure doman-name-servers=10.24.34.2. Associate the new DHCP options set with the VPC.",
+          "text": "Deactivate the enableDnsSupport attribute for the VPC. Activate the enableDnsHostnames attribute for the VPC. Create a new VPC DHCP options set, and configure doman-name-servers=10.24.34.2. Associate the new DHCP options set with the VPC.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -41699,7 +41699,7 @@
       },
       {
         "letter": "C",
-        "text": "Create a new Gateway Load Balancer in the shared services VPCreate a new target group, and attach it to the new Gateway Load Balancer Add each of the firewall appliance instances to the target group."
+        "text": "Create a new Gateway Load Balancer in the shared services VPC. Create a new target group, and attach it to the new Gateway Load Balancer Add each of the firewall appliance instances to the target group."
       },
       {
         "letter": "D",
@@ -41760,7 +41760,7 @@
         },
         {
           "letter": "C",
-          "text": "Create a new Gateway Load Balancer in the shared services VPCreate a new target group, and attach it to the new Gateway Load Balancer Add each of the firewall appliance instances to the target group.",
+          "text": "Create a new Gateway Load Balancer in the shared services VPC. Create a new target group, and attach it to the new Gateway Load Balancer Add each of the firewall appliance instances to the target group.",
           "is_correct": true,
           "reasoning": [
             "✅ Provides network-level security through VPC and security groups"
@@ -41861,7 +41861,7 @@
       },
       {
         "letter": "C",
-        "text": "Create a bootstrap automation script to request a new license file from the vendor .When the response is received, apply the license file to an Amazon EC2 instance."
+        "text": "Create a bootstrap automation script to request a new license file from the vendor . When the response is received, apply the license file to an Amazon EC2 instance."
       },
       {
         "letter": "D",
@@ -41922,7 +41922,7 @@
         },
         {
           "letter": "C",
-          "text": "Create a bootstrap automation script to request a new license file from the vendor .When the response is received, apply the license file to an Amazon EC2 instance.",
+          "text": "Create a bootstrap automation script to request a new license file from the vendor . When the response is received, apply the license file to an Amazon EC2 instance.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -46526,7 +46526,7 @@
       },
       {
         "letter": "C",
-        "text": "Create a NAT instance in the VPConfigure VPC routes to allow access to the internet. Configure SageMaker notebook instance firewall rules that allow access to only the PyPI repository endpoint."
+        "text": "Create a NAT instance in the VPC. Configure VPC routes to allow access to the internet. Configure SageMaker notebook instance firewall rules that allow access to only the PyPI repository endpoint."
       },
       {
         "letter": "D",
@@ -46578,7 +46578,7 @@
         },
         {
           "letter": "C",
-          "text": "Create a NAT instance in the VPConfigure VPC routes to allow access to the internet. Configure SageMaker notebook instance firewall rules that allow access to only the PyPI repository endpoint.",
+          "text": "Create a NAT instance in the VPC. Configure VPC routes to allow access to the internet. Configure SageMaker notebook instance firewall rules that allow access to only the PyPI repository endpoint.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -58155,7 +58155,7 @@
       },
       {
         "letter": "B",
-        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target.FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server."
+        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target. FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server."
       },
       {
         "letter": "C",
@@ -58163,7 +58163,7 @@
       },
       {
         "letter": "D",
-        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb.InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server."
+        "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb. InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server."
       },
       {
         "letter": "E",
@@ -58203,7 +58203,7 @@
         },
         {
           "letter": "B",
-          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target.FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server.",
+          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target. FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
@@ -58235,7 +58235,7 @@
         },
         {
           "letter": "D",
-          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb.InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server.",
+          "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb. InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server.",
           "is_correct": false,
           "reasoning": [
             "❌ This solution doesn't optimally address the specific requirements stated in the question",
