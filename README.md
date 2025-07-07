@@ -2,6 +2,12 @@
 
 A comprehensive web application designed to help you prepare for the AWS Certified Solutions Architect Professional (SAP-C02) exam. This app includes practice questions, exam simulations, analytics, AWS services reference, and a complete cloud solution architect guide.
 
+## 🎯 Latest Updates (July 2025)
+- ✅ **Submit Answer Fixed**: Resolved DetailedExplanation component crash
+- ✅ **JavaScript Loading Fixed**: Resolved MIME type errors for proper module loading  
+- ✅ **PWA Icons Added**: Complete manifest with 192x192, 512x512 icons
+- ✅ **Complete Dataset**: All 529 questions with full context from PDF source
+
 ## 🚀 Features
 
 ### 📚 Practice Mode
