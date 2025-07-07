@@ -7,7 +7,6 @@ import AuthPage from './pages/AuthPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 import { useUserProgress } from './hooks/useUserProgress';
-import { ROUTES } from './constants';
 import { initializeProgressPersistence, cleanupProgressPersistence } from './utils/progressPersistence';
 
 // Lazy load pages for better performance
@@ -33,15 +32,15 @@ const ProtectedAppContent: React.FC = () => {
     <Layout>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          <Route path={ROUTES.HOME} element={<HomePage />} />
-          <Route path={ROUTES.PRACTICE} element={<PracticePage />} />
-          <Route path={ROUTES.EXAM} element={<ExamPage />} />
-          <Route path={ROUTES.ANALYTICS} element={<AnalyticsPage />} />
-          <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
-          <Route path={ROUTES.ARCHITECT} element={<ArchitectGuidePage />} />
-          <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="/exam" element={<ExamPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/architect" element={<ArchitectGuidePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           {/* Catch all route for authenticated users */}
-          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </Layout>
@@ -71,7 +70,7 @@ function App() {
         <Route 
           path="/" 
           element={
-            isAuthenticated ? <Navigate to={ROUTES.HOME} replace /> : <LandingPage />
+            isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />
           } 
         />
         <Route path="/auth" element={<AuthPage />} />
@@ -85,14 +84,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        
-        {/* Legacy route redirects for backward compatibility */}
-        <Route path="/practice" element={<Navigate to="/dashboard/practice" replace />} />
-        <Route path="/exam" element={<Navigate to="/dashboard/exam" replace />} />
-        <Route path="/analytics" element={<Navigate to="/dashboard/analytics" replace />} />
-        <Route path="/services" element={<Navigate to="/dashboard/services" replace />} />
-        <Route path="/architect" element={<Navigate to="/dashboard/architect" replace />} />
-        <Route path="/settings" element={<Navigate to="/dashboard/settings" replace />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
