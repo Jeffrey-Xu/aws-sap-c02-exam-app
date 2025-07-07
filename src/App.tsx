@@ -5,6 +5,7 @@ import ProtectedLayout from './components/layout/ProtectedLayout';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
+import UserProgressManager from './components/auth/UserProgressManager';
 import { useAuthStore } from './stores/authStore';
 import { useUserProgress } from './hooks/useUserProgress';
 import { initializeProgressPersistence, cleanupProgressPersistence } from './utils/progressPersistence';
@@ -58,6 +59,9 @@ function App() {
 
   return (
     <Router>
+      {/* User Progress Manager - handles user-specific data isolation */}
+      <UserProgressManager />
+      
       <Routes>
         {/* Root route - Landing page or Dashboard based on auth */}
         <Route path="/" element={<RootRoute />} />

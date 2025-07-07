@@ -2,6 +2,57 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { QuestionProgress, CategoryProgress, ExamDomain, UserProgress } from '../types';
 
+// Helper function to get user-specific storage key
+const getUserProgressKey = (userId: string) => `progress-store-${userId}`;
+
+// Helper function to load user-specific progress from localStorage
+const loadUserProgressFromStorage = (userId: string): Partial<UserProgress> => {
+  try {
+    const key = getUserProgressKey(userId);
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      
+      // Convert date strings back to Date objects
+      if (parsed.questionProgress) {
+        Object.values(parsed.questionProgress).forEach((progress: any) => {
+          if (progress.lastAttempted) {
+            progress.lastAttempted = new Date(progress.lastAttempted);
+          }
+          if (progress.masteredAt) {
+            progress.masteredAt = new Date(progress.masteredAt);
+          }
+        });
+      }
+      if (parsed.categoryProgress) {
+        Object.values(parsed.categoryProgress).forEach((category: any) => {
+          if (category.lastStudied) {
+            category.lastStudied = new Date(category.lastStudied);
+          }
+        });
+      }
+      if (parsed.lastStudied) {
+        parsed.lastStudied = new Date(parsed.lastStudied);
+      }
+      
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Error loading user progress:', error);
+  }
+  return {};
+};
+
+// Helper function to save user-specific progress to localStorage
+const saveUserProgressToStorage = (userId: string, progress: UserProgress) => {
+  try {
+    const key = getUserProgressKey(userId);
+    localStorage.setItem(key, JSON.stringify(progress));
+  } catch (error) {
+    console.error('Error saving user progress:', error);
+  }
+};
+
 interface ProgressStore extends UserProgress {
   questionProgress: Record<number, QuestionProgress>;
   
@@ -23,10 +74,10 @@ interface ProgressStore extends UserProgress {
   importProgress: (data: string) => boolean;
   getStorageStats: () => any;
   
-  // Multi-user support
+  // User-specific methods
   loadUserProgress: (userId: string) => void;
   saveUserProgress: (userId: string) => void;
-  clearUserProgress: (userId: string) => void;
+  switchUser: (userId: string) => void;
 }
 
 const defaultQuestionProgress = (questionId: number): QuestionProgress => ({
@@ -40,59 +91,6 @@ const defaultQuestionProgress = (questionId: number): QuestionProgress => ({
   notes: ''
 });
 
-// Helper functions for user-specific storage
-const getUserProgressKey = (userId: string) => `user_progress_${userId}`;
-
-const loadUserProgressData = (userId: string): Partial<ProgressStore> => {
-  try {
-    const key = getUserProgressKey(userId);
-    const data = localStorage.getItem(key);
-    if (data) {
-      const parsed = JSON.parse(data);
-      // Convert date strings back to Date objects
-      if (parsed.questionProgress) {
-        Object.values(parsed.questionProgress).forEach((progress: any) => {
-          if (progress.lastAttempted) {
-            progress.lastAttempted = new Date(progress.lastAttempted);
-          }
-          if (progress.masteredAt) {
-            progress.masteredAt = new Date(progress.masteredAt);
-          }
-        });
-      }
-      if (parsed.examAttempts) {
-        parsed.examAttempts.forEach((attempt: any) => {
-          if (attempt.startTime) attempt.startTime = new Date(attempt.startTime);
-          if (attempt.endTime) attempt.endTime = new Date(attempt.endTime);
-        });
-      }
-      if (parsed.categoryProgress) {
-        Object.values(parsed.categoryProgress).forEach((category: any) => {
-          if (category.lastStudied) {
-            category.lastStudied = new Date(category.lastStudied);
-          }
-        });
-      }
-      if (parsed.lastStudied) {
-        parsed.lastStudied = new Date(parsed.lastStudied);
-      }
-      return parsed;
-    }
-  } catch (error) {
-    console.error('Error loading user progress:', error);
-  }
-  return {};
-};
-
-const saveUserProgressData = (userId: string, data: Partial<ProgressStore>) => {
-  try {
-    const key = getUserProgressKey(userId);
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error('Error saving user progress:', error);
-  }
-};
-
 export const useProgressStore = create<ProgressStore>()(
   persist(
     (set, get) => ({
@@ -105,7 +103,7 @@ export const useProgressStore = create<ProgressStore>()(
       examAttempts: [],
 
       loadUserProgress: (userId: string) => {
-        const userData = loadUserProgressData(userId);
+        const userData = loadUserProgressFromStorage(userId);
         set({
           questionProgress: userData.questionProgress || {},
           totalQuestions: userData.totalQuestions || 0,
@@ -130,7 +128,7 @@ export const useProgressStore = create<ProgressStore>()(
           examAttempts: state.examAttempts,
           lastStudied: state.lastStudied
         };
-        saveUserProgressData(userId, dataToSave);
+        saveUserProgressToStorage(userId, dataToSave);
       },
 
       clearUserProgress: (userId: string) => {
@@ -418,7 +416,8 @@ export const useProgressStore = create<ProgressStore>()(
           examAttempts: state.examAttempts.length,
           lastStudied: state.lastStudied?.toISOString() || 'Never'
         };
-      }
+      },
+
     }),
     {
       name: 'progress-store',
