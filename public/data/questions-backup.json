@@ -266,6 +266,10 @@
       {
         "letter": "D",
         "text": "Modify the DB instance to create a Multi-AZ deployment that extends across two Availability Zones. Most Voted"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADF",
@@ -296,6 +300,10 @@
       {
         "letter": "D",
         "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
@@ -450,6 +458,10 @@
       {
         "letter": "D",
         "text": "Create a private hosted zone for the example com domain in Account B. Configure Route 53 replication between AWS"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CE",
@@ -852,6 +864,14 @@
       {
         "letter": "D",
         "text": "Use an Amazon API Gateway API with a custom domain to publish an AWS Lambda function."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CEF",
@@ -1192,6 +1212,10 @@
       {
         "letter": "D",
         "text": "Group servers into applications for migration by using AWS Migration Hub. Most Voted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADE",
@@ -1686,6 +1710,10 @@
       {
         "letter": "D",
         "text": "Activate IAM access to Billing and Cost Management."
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -1809,6 +1837,10 @@
       {
         "letter": "D",
         "text": "Create an IAM policy in the destination account. Configure the policy to allow a user in the destination account to list"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDF",
@@ -2024,6 +2056,10 @@
       {
         "letter": "D",
         "text": "Create an IAM policy to deny access to costly services and components. Apply the IAM policy to the developer accounts."
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BCF",
@@ -2456,6 +2492,10 @@
       {
         "letter": "D",
         "text": "Use AWS X-Ray to analyze and debug application issues and add more API servers to match the load."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CE",
@@ -3172,6 +3212,10 @@
       {
         "letter": "D",
         "text": "In the development account, create a role. Attach the new policy to the role Define the production account as a trusted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -3481,6 +3525,10 @@
       {
         "letter": "D",
         "text": "Create an IAM policy in each account with a deny action for ec2:RunInstances if the Project tag is missing."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ABE",
@@ -3603,6 +3651,10 @@
       {
         "letter": "D",
         "text": "Invoke an AWS Step Functions state machine to remove access. Most Voted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADE",
@@ -3785,6 +3837,10 @@
       {
         "letter": "D",
         "text": "Share the transit gateway with other accounts. Attach VPCs to the transit gateway. Most Voted"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDF",
@@ -3845,6 +3901,10 @@
       {
         "letter": "D",
         "text": "Migrate the database to Amazon Aurora MySQL. Most Voted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CDE",
@@ -3937,6 +3997,10 @@
       {
         "letter": "D",
         "text": "One of the VPCs was not shared through AWS Resource Access Manager"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
@@ -4061,6 +4125,10 @@
       {
         "letter": "D",
         "text": "Create an SCP. Use the ec2:Region condition key to restrict access to all AWS Regions except ap-northeast-1. Apply the"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CE",
@@ -4215,6 +4283,10 @@
       {
         "letter": "D",
         "text": "Create a bucket policy that includes read permissions for the S3 bucket. Set the principal of the bucket policy to an"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -4647,6 +4719,10 @@
       {
         "letter": "D",
         "text": "Change all the backend EC2 instances to Spot Instances."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -5171,6 +5247,10 @@
       {
         "letter": "D",
         "text": "Invite existing accounts to join the organization in AWS Organizations. Create SCPs to ensure compliance. Most Voted"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CDF",
@@ -5727,6 +5807,10 @@
       {
         "letter": "D",
         "text": "Create an S3 Lifecycle rule for each S3 bucket to copy objects from one S3 bucket to the other S3 bucket"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ABE",
@@ -5757,6 +5841,10 @@
       {
         "letter": "D",
         "text": "Write the metadata to Amazon DocumentDB (with MongoDB compatibility) Most Voted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDE",
@@ -5818,6 +5906,10 @@
       {
         "letter": "D",
         "text": "Configure Amazon ElastiCache to reduce overhead on DynamoDB."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
@@ -6035,6 +6127,10 @@
       {
         "letter": "D",
         "text": "Store the timesheet submission data in Amazon Redshift. Use Amazon QuickSight to generate the reports using Amazon"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CE",
@@ -6066,6 +6162,10 @@
       {
         "letter": "D",
         "text": "Configure Amazon S3 to send object deletion events to an Amazon EventBridge event bus that publishes to an Amazon"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADF",
@@ -6159,6 +6259,10 @@
       {
         "letter": "D",
         "text": "The on-premises IdP's DNS hostname is reachable from the AWS environment VPCs."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BCE",
@@ -6313,6 +6417,10 @@
       {
         "letter": "D",
         "text": "Configure encryption at rest on CloudFront by using server-side encryption with AWS KMS keys (SSE-KMS)."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -6776,6 +6884,10 @@
       {
         "letter": "D",
         "text": "Reshard the stream to reduce the number of shards in the stream."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -6837,6 +6949,10 @@
       {
         "letter": "D",
         "text": "Create an alarm for the custom metric in Amazon CloudWatch for the failure scenarios. Configure the alarm to publish a"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDE",
@@ -7238,6 +7354,10 @@
       {
         "letter": "D",
         "text": "Ensure the cluster is launched across multiple Availability Zones."
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -7390,6 +7510,10 @@
       {
         "letter": "D",
         "text": "Back up data from an Amazon DynamoDB table in the primary Region every 60 minutes and then write the data to"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BCE",
@@ -7543,6 +7667,10 @@
       {
         "letter": "D",
         "text": "Create an OU that includes all the development teams. Create an SCP that denies the creation of resources in Regions"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDE",
@@ -8036,6 +8164,10 @@
       {
         "letter": "D",
         "text": "Deploy an AWS Managed Microsoft AD directory in the management account. Share the directory with all other accounts"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -8159,6 +8291,14 @@
       {
         "letter": "D",
         "text": "Sign in to the new developer organization's management account and create a placeholder member account that acts as"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BEF",
@@ -8469,6 +8609,10 @@
       {
         "letter": "D",
         "text": "Temporarily allow the source DB instance to be publicly accessible to provide connectivity from the VPC in the target"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -9518,6 +9662,10 @@
       {
         "letter": "D",
         "text": "Configure the identity-based policy on the user in Account B to allow the action."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -9641,6 +9789,10 @@
       {
         "letter": "D",
         "text": "Create a VPC interface endpoint. Add a route to the route table in the shared services VPC. Designate the new endpoint"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -10319,6 +10471,10 @@
       {
         "letter": "D",
         "text": "Use an Aurora global database for physical cross-Region replication. Use Amazon S3 with cross-Region replication for"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "DE",
@@ -10414,6 +10570,10 @@
       {
         "letter": "D",
         "text": "Create an IAM role that grants Amazon CloudWatch Logs the permission to add data to the Amazon Simple Queue"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -10444,6 +10604,10 @@
       {
         "letter": "D",
         "text": "Use an AWS Server Migration Service (AWS SMS) replication job to migrate the application server VM to AWS. Most Voted"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "DE",
@@ -10875,6 +11039,10 @@
       {
         "letter": "D",
         "text": "AWS Cloud Adoption Readiness Tool (CART) Most Voted"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADF",
@@ -11492,6 +11660,10 @@
       {
         "letter": "D",
         "text": "Remove the default FullAWSAccess SCP."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ABE",
@@ -11553,6 +11725,10 @@
       {
         "letter": "D",
         "text": "Create an AWS Direct Connect connection and a Direct Connect gateway between the on-premises network and the"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADE",
@@ -11890,6 +12066,10 @@
       {
         "letter": "D",
         "text": "Allow user IAM roles to have ServiceCatalogEndUserAccess permissions only. Use an automation script to import the"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BDE",
@@ -12230,6 +12410,10 @@
       {
         "letter": "D",
         "text": "Invoke an S3 Batch Operations job to perform image processing when a message is available in the queue."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BCE",
@@ -12291,6 +12475,10 @@
       {
         "letter": "D",
         "text": "Apply security groups to the tasks, and pass IAM credentials into the container at launch time to access other resources."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -12322,6 +12510,10 @@
       {
         "letter": "D",
         "text": "Host the Lambda functions outside the VPC. Create a VPC endpoint for the Neptune database, and have the Lambda"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -13469,6 +13661,10 @@
       {
         "letter": "D",
         "text": "Provision two NAT gateways in the database VPC."
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -13499,6 +13695,10 @@
       {
         "letter": "D",
         "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
@@ -13620,6 +13820,10 @@
       {
         "letter": "D",
         "text": "The setting to evaluate target health is not turned on for the latency alias resource record set that is associated with the"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "DE",
@@ -13682,6 +13886,10 @@
       {
         "letter": "D",
         "text": "Configure an Amazon CloudWatch alarm for Amazon RDS with an action to recover a high-load, impaired RDS instance in"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -14178,6 +14386,10 @@
       {
         "letter": "D",
         "text": "Modify the web-crawling process to store results in an Amazon Aurora Serverless MySQL instance."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -14518,6 +14730,10 @@
       {
         "letter": "D",
         "text": "Create an Auto Scaling group. Configure an AWS Launch Wizard deployment that uses the new script as user data to"
+      },
+      {
+        "letter": "F",
+        "text": "[Option F - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACF",
@@ -14702,6 +14918,10 @@
       {
         "letter": "D",
         "text": "Refactor the Java application, Develop a Docker container to run the Java application. Use AWS Fargate to host the"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ACE",
@@ -15376,6 +15596,10 @@
       {
         "letter": "D",
         "text": "Create an S3 Lifecycle configuration to transition objects to S3 Glacier Instant Retrieval after 1 day."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "CE",
@@ -15560,6 +15784,10 @@
       {
         "letter": "D",
         "text": "Connect the IoT devices to AWS IoT Core to publish messages. Create an AWS IoT rule that runs when a message is"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADE",
@@ -15683,6 +15911,10 @@
       {
         "letter": "D",
         "text": "Update the Route 53 hosted zone record for the application to use latency-based routing. Send traffic to the ALB in each"
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ADE",
@@ -15836,6 +16068,10 @@
       {
         "letter": "D",
         "text": "Use an AWS Site-to-Site VPN connection to connect to a Multi-Region Access Point."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
@@ -16026,6 +16262,10 @@
       {
         "letter": "D",
         "text": "Enable scanning in the Monitor settings of the Lambda functions that need code scans."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "ABE",
@@ -16241,6 +16481,10 @@
       {
         "letter": "D",
         "text": "Update the VPC route table to route S3 traffic to an S3 access point."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "BE",
@@ -16303,6 +16547,10 @@
       {
         "letter": "D",
         "text": "Enable S3 Transfer Acceleration on the S3 bucket."
+      },
+      {
+        "letter": "E",
+        "text": "[Option E - Content needs to be added based on question context]"
       }
     ],
     "correct_answer": "AE",
