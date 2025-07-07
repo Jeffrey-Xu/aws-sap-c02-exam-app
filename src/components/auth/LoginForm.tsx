@@ -17,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup, onForgotPasswor
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const { login, isLoading, error, clearError, resendVerification } = useAuthStore();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -58,23 +58,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup, onForgotPasswor
 
     const result = await login(formData);
     
-    if (!result.success && result.error?.code === 'EMAIL_NOT_VERIFIED') {
-      // Show option to resend verification
-      setFieldErrors({
-        email: 'Email not verified. Check your inbox or resend verification email.'
-      });
-    }
-  };
-
-  const handleResendVerification = async () => {
-    if (formData.email) {
-      const success = await resendVerification(formData.email);
-      if (success) {
-        setFieldErrors({
-          email: 'Verification email sent! Please check your inbox.'
-        });
-      }
-    }
+    // No special handling needed - user will be redirected automatically if login succeeds
+    // All error handling is done through the global error state
   };
 
   return (
@@ -111,15 +96,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup, onForgotPasswor
               <div className="mt-2 flex items-center text-sm text-red-600">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {fieldErrors.email}
-                {fieldErrors.email.includes('not verified') && (
-                  <button
-                    type="button"
-                    onClick={handleResendVerification}
-                    className="ml-2 text-aws-orange hover:text-aws-orange-dark underline"
-                  >
-                    Resend
-                  </button>
-                )}
               </div>
             )}
           </div>

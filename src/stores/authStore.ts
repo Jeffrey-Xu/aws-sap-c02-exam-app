@@ -27,24 +27,56 @@ interface AuthStore extends AuthState {
 const getStoredUsers = (): StoredUser[] => {
   try {
     const users = localStorage.getItem(USERS_STORAGE_KEY);
-    return users ? JSON.parse(users) : [];
+    const parsedUsers = users ? JSON.parse(users) : [];
+    
+    // Migrate legacy users to ensure isEmailVerified is always true
+    const migratedUsers = parsedUsers.map((user: any) => ({
+      ...user,
+      isEmailVerified: true // Force all users to be verified
+    }));
+    
+    // Save migrated users back to localStorage
+    if (migratedUsers.length > 0) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(migratedUsers));
+    }
+    
+    return migratedUsers;
   } catch {
     return [];
   }
 };
 
 const saveStoredUsers = (users: StoredUser[]): void => {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  // Ensure all users have isEmailVerified: true before saving
+  const verifiedUsers = users.map(user => ({
+    ...user,
+    isEmailVerified: true
+  }));
+  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(verifiedUsers));
 };
 
 const findUserByEmail = (email: string): StoredUser | null => {
   const users = getStoredUsers();
-  return users.find(user => user.email.toLowerCase() === email.toLowerCase()) || null;
+  const user = users.find(user => user.email.toLowerCase() === email.toLowerCase()) || null;
+  
+  // Ensure found user is marked as verified
+  if (user) {
+    user.isEmailVerified = true;
+  }
+  
+  return user;
 };
 
 const findUserById = (id: string): StoredUser | null => {
   const users = getStoredUsers();
-  return users.find(user => user.id === id) || null;
+  const user = users.find(user => user.id === id) || null;
+  
+  // Ensure found user is marked as verified
+  if (user) {
+    user.isEmailVerified = true;
+  }
+  
+  return user;
 };
 
 const convertStoredUserToUser = (storedUser: StoredUser): User => ({
@@ -95,11 +127,14 @@ export const useAuthStore = create<AuthStore>()(
             return { success: false, error };
           }
 
+          // No email verification check - all users are considered verified
+
           // Update last login
           const users = getStoredUsers();
           const userIndex = users.findIndex(u => u.id === storedUser.id);
           if (userIndex !== -1) {
             users[userIndex].lastLoginAt = new Date().toISOString();
+            users[userIndex].isEmailVerified = true; // Ensure verified
             saveStoredUsers(users);
           }
 
@@ -228,11 +263,12 @@ export const useAuthStore = create<AuthStore>()(
           if (updates.firstName) users[userIndex].firstName = updates.firstName.trim();
           if (updates.lastName) users[userIndex].lastName = updates.lastName.trim();
           if (updates.profilePicture !== undefined) users[userIndex].profilePicture = updates.profilePicture;
+          users[userIndex].isEmailVerified = true; // Ensure verified
 
           saveStoredUsers(users);
 
           // Update current user state
-          const updatedUser = { ...user, ...updates };
+          const updatedUser = { ...user, ...updates, isEmailVerified: true };
           set({ user: updatedUser });
 
           return true;
@@ -279,7 +315,7 @@ export const useAuthStore = create<AuthStore>()(
       checkSession: () => {
         const { user } = get();
         if (user) {
-          // Verify user still exists
+          // Verify user still exists and ensure they're marked as verified
           const storedUser = findUserById(user.id);
           if (!storedUser) {
             set({
@@ -287,6 +323,10 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: false,
               error: 'Session expired'
             });
+          } else {
+            // Update user to ensure email verification is true
+            const updatedUser = { ...user, isEmailVerified: true };
+            set({ user: updatedUser });
           }
         }
       },
@@ -306,7 +346,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: SESSION_STORAGE_KEY,
       partialize: (state) => ({
-        user: state.user,
+        user: state.user ? { ...state.user, isEmailVerified: true } : null,
         isAuthenticated: state.isAuthenticated
       })
     }
