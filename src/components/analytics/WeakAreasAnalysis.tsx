@@ -215,10 +215,11 @@ const WeakAreasAnalysis: React.FC<WeakAreasAnalysisProps> = ({
               <div className="mb-4">
                 <div className="flex justify-between text-sm text-gray-600 mb-1">
                   <span>Progress to Mastery</span>
-                  <span>{Math.round(area.score)}% / 85%</span>
+                  <span>{categoryProgress[area.domain]?.masteredQuestions || 0} / {area.attempts}</span>
                 </div>
                 <ProgressBar 
-                  progress={area.score} 
+                  value={categoryProgress[area.domain]?.masteredQuestions || 0}
+                  max={area.attempts}
                   color={area.priority === 'high' ? 'red' : area.priority === 'medium' ? 'orange' : 'green'}
                   size="sm"
                 />
