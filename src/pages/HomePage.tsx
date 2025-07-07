@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame } from 'lucide-react';
+import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle } from 'lucide-react';
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
 import { useQuestionStore } from '../stores/questionStore';
 import { useProgressStore } from '../stores/progressStore';
 import { ROUTES, DOMAIN_INFO } from '../constants';
 import { calculateReadinessScore, safePercentage, safeNumber } from '../utils/questionUtils';
+import type { QuestionStatus } from '../types';
 
 const HomePage: React.FC = () => {
   const { questions, loading, loadQuestions } = useQuestionStore();
@@ -16,8 +17,30 @@ const HomePage: React.FC = () => {
     categoryProgress, 
     studyStreak,
     examAttempts,
-    calculateProgress 
+    calculateProgress,
+    questionProgress
   } = useProgressStore();
+  
+  // Calculate status statistics
+  const statusStats = React.useMemo(() => {
+    const stats = {
+      new: 0,
+      practicing: 0,
+      mastered: 0,
+      'needs-review': 0
+    };
+    
+    // Count questions by status
+    Object.values(questionProgress).forEach(progress => {
+      stats[progress.status]++;
+    });
+    
+    // Add questions that haven't been attempted yet (they're "new")
+    const attemptedQuestions = Object.keys(questionProgress).length;
+    stats.new += Math.max(0, questions.length - attemptedQuestions);
+    
+    return stats;
+  }, [questionProgress, questions.length]);
   
   useEffect(() => {
     if (questions.length === 0 && !loading) {
@@ -121,6 +144,117 @@ const HomePage: React.FC = () => {
             <div className="text-center">
               <div className="text-xl font-bold text-purple-600">{examAttempts.length}</div>
               <div className="text-xs text-gray-600">Exams Taken</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+      
+      {/* Question Status Overview */}
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+            <HelpCircle className="w-5 h-5 mr-2 text-blue-600" />
+            Question Status Overview
+          </h2>
+          <Link 
+            to={ROUTES.PRACTICE} 
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            Practice Now →
+          </Link>
+        </div>
+        
+        {/* Status Statistics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Flag className="w-5 h-5 text-gray-600 mr-1" />
+              <span className="text-2xl font-bold text-gray-800">{statusStats.new}</span>
+            </div>
+            <div className="text-sm font-medium text-gray-700">New</div>
+            <div className="text-xs text-gray-500 mt-1">
+              {questions.length > 0 ? Math.round((statusStats.new / questions.length) * 100) : 0}%
+            </div>
+          </div>
+          
+          <div className="bg-blue-50 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <RotateCcw className="w-5 h-5 text-blue-600 mr-1" />
+              <span className="text-2xl font-bold text-blue-800">{statusStats.practicing}</span>
+            </div>
+            <div className="text-sm font-medium text-blue-700">Practicing</div>
+            <div className="text-xs text-blue-500 mt-1">
+              {questions.length > 0 ? Math.round((statusStats.practicing / questions.length) * 100) : 0}%
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <CheckCircle className="w-5 h-5 text-green-600 mr-1" />
+              <span className="text-2xl font-bold text-green-800">{statusStats.mastered}</span>
+            </div>
+            <div className="text-sm font-medium text-green-700">Mastered</div>
+            <div className="text-xs text-green-500 mt-1">
+              {questions.length > 0 ? Math.round((statusStats.mastered / questions.length) * 100) : 0}%
+            </div>
+          </div>
+          
+          <div className="bg-red-50 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 mr-1" />
+              <span className="text-2xl font-bold text-red-800">{statusStats['needs-review']}</span>
+            </div>
+            <div className="text-sm font-medium text-red-700">Needs Review</div>
+            <div className="text-xs text-red-500 mt-1">
+              {questions.length > 0 ? Math.round((statusStats['needs-review'] / questions.length) * 100) : 0}%
+            </div>
+          </div>
+        </div>
+        
+        {/* Status Definitions */}
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Status Definitions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="flex items-start space-x-3">
+              <Flag className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">New</div>
+                <div className="text-gray-600">Questions you haven't attempted yet</div>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <RotateCcw className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">Practicing</div>
+                <div className="text-gray-600">Answered correctly, but need more practice</div>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">Mastered</div>
+                <div className="text-gray-600">Answered correctly 3+ times or manually marked</div>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">Needs Review</div>
+                <div className="text-gray-600">Answered incorrectly or marked for review</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-start space-x-2">
+              <HelpCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <strong>Study Tip:</strong> Focus on "Needs Review" questions first, then work on "New" questions. 
+                Use manual status controls to override automatic tracking based on your confidence level.
+              </div>
             </div>
           </div>
         </div>

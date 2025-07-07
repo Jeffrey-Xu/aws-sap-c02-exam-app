@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bookmark, BookmarkCheck, Flag, Clock } from 'lucide-react';
+import { Bookmark, BookmarkCheck, Flag, Clock, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react';
 import type { Question } from '../../types';
 import { parseCorrectAnswers, isMultipleChoice } from '../../utils/questionUtils';
 import Button from '../common/Button';
@@ -31,7 +31,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     getQuestionProgress, 
     addBookmark, 
     removeBookmark, 
-    addNote 
+    addNote,
+    markAsMastered,
+    markForReview
   } = useProgressStore();
   
   const questionProgress = getQuestionProgress(question.id);
@@ -208,6 +210,57 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           question={question} 
           userAnswer={selectedAnswers.join('')}
         />
+      )}
+      
+      {/* Manual Status Control */}
+      {submitted && (
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700">Question Status:</span>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                questionProgress.status === 'mastered' ? 'bg-green-100 text-green-800' :
+                questionProgress.status === 'practicing' ? 'bg-blue-100 text-blue-800' :
+                questionProgress.status === 'needs-review' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {questionProgress.status === 'mastered' && <CheckCircle size={12} className="mr-1" />}
+                {questionProgress.status === 'needs-review' && <AlertTriangle size={12} className="mr-1" />}
+                {questionProgress.status === 'practicing' && <RotateCcw size={12} className="mr-1" />}
+                {questionProgress.status === 'new' && <Flag size={12} className="mr-1" />}
+                {questionProgress.status.charAt(0).toUpperCase() + questionProgress.status.slice(1).replace('-', ' ')}
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => markAsMastered(question.id)}
+                disabled={questionProgress.status === 'mastered'}
+                className="text-green-700 border-green-300 hover:bg-green-50"
+              >
+                <CheckCircle size={14} className="mr-1" />
+                Mark as Mastered
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => markForReview(question.id)}
+                disabled={questionProgress.status === 'needs-review'}
+                className="text-red-700 border-red-300 hover:bg-red-50"
+              >
+                <AlertTriangle size={14} className="mr-1" />
+                Mark for Review
+              </Button>
+            </div>
+          </div>
+          
+          <div className="mt-2 text-xs text-gray-500">
+            Manually override the question status based on your confidence level
+          </div>
+        </div>
       )}
     </Card>
   );
