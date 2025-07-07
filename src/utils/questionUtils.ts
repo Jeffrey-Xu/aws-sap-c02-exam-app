@@ -17,8 +17,58 @@ export function safeNumber(value: any, defaultValue: number = 0): number {
 }
 
 export function categorizeQuestion(question: Question): ExamDomain {
-  if (question.category) return question.category;
+  // Map data categories to proper ExamDomains
+  if (question.category) {
+    switch (question.category) {
+      case 'design-solutions':
+        // Distribute design-solutions questions across domains based on content
+        return categorizeDesignSolutionQuestion(question);
+      case 'new-solutions':
+        return 'new-solutions';
+      case 'continuous-improvement':
+        return 'continuous-improvement';
+      default:
+        // If category exists but doesn't match, fall through to content analysis
+        break;
+    }
+  }
   
+  // Content-based categorization for questions without proper categories
+  return categorizeByContent(question);
+}
+
+function categorizeDesignSolutionQuestion(question: Question): ExamDomain {
+  const questionText = question.question.toLowerCase();
+  const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
+  const explanationText = (question.explanation || '').toLowerCase();
+  const fullText = `${questionText} ${optionsText} ${explanationText}`;
+  
+  // Organizational Complexity indicators (highest priority)
+  if (fullText.match(/\b(organization|organizations|account|accounts|cross-account|multi-account|scp|service control policy|ou|organizational unit|consolidated billing|master account|member account|aws organizations)\b/gi)) {
+    return 'organizational-complexity';
+  }
+  
+  // Migration Planning indicators
+  if (fullText.match(/\b(migrate|migration|hybrid|on-premises|on-premise|legacy|moderniz|datacenter|data center|aws migration|database migration|application migration|lift and shift|rehost|replatform|refactor)\b/gi)) {
+    return 'migration-planning';
+  }
+  
+  // Cost Control indicators
+  if (fullText.match(/\b(cost|costs|pricing|budget|billing|reserved instance|savings plan|spot instance|cost optimization|cost-effective|cheapest|least expensive|minimize cost|reduce cost)\b/gi)) {
+    return 'cost-control';
+  }
+  
+  // Continuous Improvement indicators
+  if (fullText.match(/\b(monitor|monitoring|cloudwatch|alarm|metric|log|logging|cloudtrail|performance|optimize|optimization|troubleshoot|debug|alert|notification)\b/gi)) {
+    return 'continuous-improvement';
+  }
+  
+  // Default to new-solutions for design questions that don't fit other categories
+  return 'new-solutions';
+}
+
+function categorizeByContent(question: Question): ExamDomain {
+function categorizeByContent(question: Question): ExamDomain {
   const questionText = question.question.toLowerCase();
   const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
   const explanationText = (question.explanation || '').toLowerCase();
