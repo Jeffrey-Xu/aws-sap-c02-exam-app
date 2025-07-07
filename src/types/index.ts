@@ -69,6 +69,7 @@ export interface QuestionProgress {
   bookmarked: boolean;
   notes: string;
   masteredAt?: Date;
+  domain?: ExamDomain; // Track which domain this question belongs to
 }
 
 export interface CategoryProgress {

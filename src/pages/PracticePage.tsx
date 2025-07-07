@@ -8,6 +8,7 @@ import FlashcardMode from '../components/study/FlashcardMode';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { useQuestionStore } from '../stores/questionStore';
+import { categorizeQuestion } from '../utils/questionUtils';
 import { useProgressStore } from '../stores/progressStore';
 import { ROUTES } from '../constants';
 import type { ExamDomain, QuestionStatus } from '../types';
@@ -59,7 +60,8 @@ const PracticePage: React.FC = () => {
     if (!currentQuestion) return;
     
     const isCorrect = answer === currentQuestion.correct_answer;
-    updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent);
+    const questionDomain = categorizeQuestion(currentQuestion);
+    updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent, questionDomain);
     setShowExplanation(true);
   };
   

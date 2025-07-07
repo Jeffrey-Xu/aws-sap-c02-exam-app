@@ -6,7 +6,7 @@ interface ProgressStore extends UserProgress {
   questionProgress: Record<number, QuestionProgress>;
   
   // Actions
-  updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number) => void;
+  updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number, domain?: ExamDomain) => void;
   markAsMastered: (questionId: number) => void;
   markForReview: (questionId: number) => void;
   addBookmark: (questionId: number) => void;
@@ -142,7 +142,7 @@ export const useProgressStore = create<ProgressStore>()(
         }
       },
 
-      updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number) => {
+      updateQuestionProgress: (questionId: number, correct: boolean, timeSpent: number, domain?: ExamDomain) => {
         set((state) => {
           const currentProgress = state.questionProgress[questionId] || defaultQuestionProgress(questionId);
           
@@ -153,7 +153,8 @@ export const useProgressStore = create<ProgressStore>()(
             lastAttempted: new Date(),
             timeSpent: currentProgress.timeSpent + timeSpent,
             status: correct && currentProgress.correctAttempts >= 2 ? 'mastered' : 
-                   correct ? 'practicing' : 'needs-review'
+                   correct ? 'practicing' : 'needs-review',
+            domain: domain || currentProgress.domain // Store the domain
           };
 
           if (updatedProgress.status === 'mastered' && !currentProgress.masteredAt) {
@@ -284,7 +285,10 @@ export const useProgressStore = create<ProgressStore>()(
           const categoryProgress: Record<ExamDomain, CategoryProgress> = {} as Record<ExamDomain, CategoryProgress>;
           
           Object.entries(questionsByCategory).forEach(([domain, count]) => {
-            const domainQuestions = Object.values(state.questionProgress);
+            // Get progress for questions in this domain only
+            const domainQuestions = Object.values(state.questionProgress)
+              .filter(progress => progress.domain === domain);
+            
             const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
             const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
             const averageScore = domainQuestions.length > 0 ? 
