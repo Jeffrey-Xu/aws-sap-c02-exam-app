@@ -75,6 +75,7 @@ export interface QuestionProgress {
 export interface CategoryProgress {
   domain: ExamDomain;
   totalQuestions: number;
+  attemptedQuestions: number;
   masteredQuestions: number;
   averageScore: number;
   timeSpent: number;

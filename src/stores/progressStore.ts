@@ -290,6 +290,7 @@ export const useProgressStore = create<ProgressStore>()(
               .filter(progress => progress.domain === domain);
             
             const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
+            const attemptedInDomain = domainQuestions.filter(progress => progress.attempts > 0).length;
             const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
             
             // Calculate average score based on actual attempts
@@ -313,6 +314,7 @@ export const useProgressStore = create<ProgressStore>()(
             categoryProgress[domain as ExamDomain] = {
               domain: domain as ExamDomain,
               totalQuestions: count,
+              attemptedQuestions: attemptedInDomain,
               masteredQuestions: masteredInDomain,
               averageScore: Math.round(averageScore * 100) / 100, // Round to 2 decimal places
               timeSpent: totalTimeInDomain,
@@ -349,6 +351,7 @@ export const useProgressStore = create<ProgressStore>()(
           // Calculate progress for each domain
           Object.entries(questionsByDomain).forEach(([domain, domainQuestions]) => {
             const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
+            const attemptedInDomain = domainQuestions.filter(progress => progress.attempts > 0).length;
             const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
             
             // Calculate average score based on actual attempts
@@ -367,6 +370,7 @@ export const useProgressStore = create<ProgressStore>()(
             categoryProgress[domain as ExamDomain] = {
               domain: domain as ExamDomain,
               totalQuestions: domainQuestions.length,
+              attemptedQuestions: attemptedInDomain,
               masteredQuestions: masteredInDomain,
               averageScore: Math.round(averageScore * 100) / 100,
               timeSpent: totalTimeInDomain,

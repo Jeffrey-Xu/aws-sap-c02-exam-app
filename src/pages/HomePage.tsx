@@ -355,37 +355,42 @@ const HomePage: React.FC = () => {
 
       {/* Domain Progress */}
       <Card>
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Domain Progress</h3>
-          <Link to={ROUTES.ANALYTICS}>
-            <div className="flex items-center text-sm text-blue-600 hover:text-blue-700">
-              <BarChart3 className="w-4 h-4 mr-1" />
-              View Analytics
-            </div>
-          </Link>
+          <p className="text-sm text-gray-600 mt-1">Track your progress across all exam domains</p>
         </div>
         <div className="space-y-3">
           {Object.entries(DOMAIN_INFO).map(([domain, info]) => {
             const progress = categoryProgress[domain as keyof typeof categoryProgress];
-            const percentage = safePercentage(
-              progress?.masteredQuestions || 0, 
-              progress?.totalQuestions || 1
-            );
+            const attemptedQuestions = progress?.attemptedQuestions || 0;
+            const totalQuestions = progress?.totalQuestions || 1;
+            const masteredQuestions = progress?.masteredQuestions || 0;
+            const percentage = safePercentage(attemptedQuestions, totalQuestions);
+            const masteryPercentage = safePercentage(masteredQuestions, totalQuestions);
             
             return (
-              <div key={domain} className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">{info.name}</span>
-                    <span className="text-sm text-gray-600">{percentage}%</span>
+              <div key={domain} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-900">{info.name}</span>
+                  <div className="text-right">
+                    <span className="text-sm font-semibold text-gray-900">{percentage}%</span>
+                    <div className="text-xs text-gray-500">
+                      {attemptedQuestions} / {totalQuestions} attempted
+                    </div>
                   </div>
-                  <ProgressBar
-                    value={progress?.masteredQuestions || 0}
-                    max={progress?.totalQuestions || 1}
-                    color={percentage >= 70 ? 'green' : percentage >= 50 ? 'orange' : 'red'}
-                    size="sm"
-                  />
                 </div>
+                <ProgressBar
+                  value={attemptedQuestions}
+                  max={totalQuestions}
+                  color={percentage >= 70 ? 'green' : percentage >= 50 ? 'orange' : 'red'}
+                  size="sm"
+                />
+                {masteredQuestions > 0 && (
+                  <div className="text-xs text-green-600 flex items-center">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    {masteredQuestions} mastered ({masteryPercentage}%)
+                  </div>
+                )}
               </div>
             );
           })}
