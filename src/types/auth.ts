@@ -7,6 +7,7 @@ export interface User {
   lastLoginAt: Date;
   isEmailVerified: boolean; // Always true in simplified version
   profilePicture?: string;
+  examDate?: string; // ISO date string for scheduled exam
 }
 
 export interface UserCredentials {

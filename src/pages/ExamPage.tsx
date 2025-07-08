@@ -462,7 +462,7 @@ const ExamPage: React.FC = () => {
               </div>
               <div>
                 <div className="font-medium text-gray-900">Question Types</div>
-                <div className="text-gray-600">Multiple Choice</div>
+                <div className="text-gray-600">Single & Multiple Questions</div>
               </div>
             </div>
           </div>

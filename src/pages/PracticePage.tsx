@@ -9,6 +9,7 @@ import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { useQuestionStore } from '../stores/questionStore';
 import { categorizeQuestion } from '../utils/questionUtils';
+import { categorizeQuestion } from '../utils/questionUtils';
 import { useProgressStore } from '../stores/progressStore';
 import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES } from '../constants';
@@ -18,7 +19,6 @@ const PracticePage: React.FC = () => {
   const location = useLocation();
   const { 
     questions, 
-    filteredQuestions, 
     filters, 
     loading, 
     loadQuestions, 
@@ -58,6 +58,46 @@ const PracticePage: React.FC = () => {
     setShowExplanation(false);
   }, [filteredQuestions]);
   
+  // Apply filters with progress data for bookmarks
+  const filteredQuestions = React.useMemo(() => {
+    return questions.filter(question => {
+      // Category filter
+      if (filters.category && categorizeQuestion(question) !== filters.category) {
+        return false;
+      }
+      
+      // Status filter
+      if (filters.status) {
+        const progress = questionProgress[question.id];
+        const status = progress?.status || 'new';
+        if (status !== filters.status) {
+          return false;
+        }
+      }
+      
+      // Bookmark filter
+      if (filters.bookmarked) {
+        const progress = questionProgress[question.id];
+        if (!progress || !progress.bookmarked) {
+          return false;
+        }
+      }
+      
+      // Search filter
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        const questionText = question.question.toLowerCase();
+        const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
+        
+        if (!questionText.includes(searchTerm) && !optionsText.includes(searchTerm)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [questions, filters, questionProgress]);
+
   const currentQuestion = filteredQuestions[currentQuestionIndex];
   
   const handleAnswer = (answer: string, timeSpent: number) => {
@@ -112,9 +152,9 @@ const PracticePage: React.FC = () => {
       ).length;
       return acc;
     }, {} as Record<ExamDomain, number>),
-    byStatus: Object.keys(questionProgress).reduce((acc, questionId) => {
-      const progress = questionProgress[parseInt(questionId)];
-      const status = progress.status;
+    byStatus: questions.reduce((acc, question) => {
+      const progress = questionProgress[question.id];
+      const status = progress?.status || 'new'; // Default to 'new' if no progress
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, { new: 0, practicing: 0, mastered: 0, 'needs-review': 0 } as Record<QuestionStatus, number>)
@@ -179,19 +219,6 @@ const PracticePage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">Practice Mode</h1>
             <p className="text-gray-600">Study by domain with instant feedback</p>
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleStartFlashcards}>
-            <Zap size={16} className="mr-1" />
-            Flashcards
-          </Button>
-          <Link to={ROUTES.ANALYTICS}>
-            <Button variant="outline">
-              <BarChart3 size={16} className="mr-1" />
-              View Progress
-            </Button>
-          </Link>
         </div>
       </div>
       

@@ -16,6 +16,7 @@ const SettingsPage: React.FC = () => {
     totalQuestions, 
     masteredQuestions, 
     totalStudyTime,
+    questionProgress,
     exportProgress,
     importProgress,
     getStorageStats
@@ -37,7 +38,8 @@ const SettingsPage: React.FC = () => {
   const [storageStats, setStorageStats] = useState<any>(null);
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
-    lastName: user?.lastName || ''
+    lastName: user?.lastName || '',
+    examDate: user?.examDate || ''
   });
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   
@@ -52,7 +54,8 @@ const SettingsPage: React.FC = () => {
     if (user) {
       setProfileData({
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        examDate: user.examDate || ''
       });
     }
   }, [user]);
@@ -66,7 +69,8 @@ const SettingsPage: React.FC = () => {
     setIsUpdatingProfile(true);
     const success = await updateProfile({
       firstName: profileData.firstName.trim(),
-      lastName: profileData.lastName.trim()
+      lastName: profileData.lastName.trim(),
+      examDate: profileData.examDate
     });
 
     if (success) {
@@ -258,6 +262,23 @@ const SettingsPage: React.FC = () => {
           </div>
           
           <div>
+            <label htmlFor="examDate" className="block text-sm font-medium text-gray-700 mb-2">
+              Scheduled Exam Date
+            </label>
+            <input
+              id="examDate"
+              type="date"
+              value={profileData.examDate}
+              onChange={(e) => setProfileData(prev => ({ ...prev, examDate: e.target.value }))}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-aws-orange focus:border-aws-orange"
+              min={new Date().toISOString().split('T')[0]}
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Set your exam date to track your preparation progress with a countdown timer
+            </p>
+          </div>
+          
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
             </label>
@@ -286,7 +307,9 @@ const SettingsPage: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{totalQuestions}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {Object.keys(questionProgress || {}).length}
+            </div>
             <div className="text-sm text-gray-600">Questions Attempted</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">

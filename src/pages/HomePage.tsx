@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle, Clock, TrendingUp } from 'lucide-react';
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
+import ExamCountdown from '../components/common/ExamCountdown';
 import { useQuestionStore } from '../stores/questionStore';
 import { useProgressStore } from '../stores/progressStore';
+import { useServerAuthStore } from '../stores/serverAuthStore';
 import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES, DOMAIN_INFO } from '../constants';
 import { calculateReadinessScore, safePercentage, safeNumber, formatTime } from '../utils/questionUtils';
@@ -13,6 +15,7 @@ import type { QuestionStatus } from '../types';
 const HomePage: React.FC = () => {
   const location = useLocation();
   const { questions, loading, loadQuestions } = useQuestionStore();
+  const { user } = useServerAuthStore();
   const { 
     totalQuestions, 
     masteredQuestions, 
@@ -112,6 +115,9 @@ const HomePage: React.FC = () => {
         </h1>
         <p className="text-lg text-gray-600">SAP-C02 Exam Preparation</p>
       </div>
+      
+      {/* Exam Countdown */}
+      <ExamCountdown examDate={user?.examDate} />
       
       {/* Progress Overview with Integrated Stats */}
       <Card>
