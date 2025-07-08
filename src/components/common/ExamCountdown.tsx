@@ -159,16 +159,14 @@ const ExamCountdown: React.FC<ExamCountdownProps> = ({ examDate, className = '' 
                 </div>
               </div>
             )}
-            {(timeRemaining.days > 0 || timeRemaining.hours > 0) && (
-              <div className="text-center">
-                <div className="text-2xl font-bold">{timeRemaining.hours}</div>
-                <div className="text-xs opacity-75">
-                  {timeRemaining.hours === 1 ? 'Hour' : 'Hours'}
-                </div>
-              </div>
-            )}
             {timeRemaining.days === 0 && (
               <>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{timeRemaining.hours}</div>
+                  <div className="text-xs opacity-75">
+                    {timeRemaining.hours === 1 ? 'Hour' : 'Hours'}
+                  </div>
+                </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">{timeRemaining.minutes}</div>
                   <div className="text-xs opacity-75">Min</div>
