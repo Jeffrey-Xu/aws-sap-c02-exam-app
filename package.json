@@ -1,8 +1,12 @@
 {
   "name": "aws-sap-c02-exam-app",
+  "version": "1.0.0",
+  "description": "AWS Solutions Architect Professional (SAP-C02) Exam Preparation Platform with Multi-User Support",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "keywords": ["aws", "sap-c02", "exam-prep", "certification", "multi-user", "react", "vercel"],
+  "author": "Jeffrey Xu",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

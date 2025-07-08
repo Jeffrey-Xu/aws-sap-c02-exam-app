@@ -1,209 +1,215 @@
-# AWS SAP-C02 Exam Preparation App
+# AWS SAP-C02 Exam Prep Platform
 
-A comprehensive web application designed to help you prepare for the AWS Certified Solutions Architect Professional (SAP-C02) exam. This app includes practice questions, exam simulations, analytics, AWS services reference, and a complete cloud solution architect guide.
-
-## 🎯 Latest Updates (July 2025)
-- ✅ **Submit Answer Fixed**: Resolved DetailedExplanation component crash
-- ✅ **JavaScript Loading Fixed**: Resolved MIME type errors for proper module loading  
-- ✅ **PWA Icons Added**: Complete manifest with 192x192, 512x512 icons
-- ✅ **Complete Dataset**: All 529 questions with full context from PDF source
+A comprehensive, multi-user exam preparation platform for the AWS Solutions Architect Professional (SAP-C02) certification with server-side user management and progress tracking.
 
 ## 🚀 Features
 
-### 📚 Practice Mode
-- **1000+ Practice Questions** across all SAP-C02 domains
-- **Domain-specific Practice** with focused question sets
-- **Immediate Feedback** with detailed explanations
-- **Progress Tracking** with mastery indicators
-- **Adaptive Learning** based on your performance
+### **Multi-User Platform**
+- **Server-side user management** with secure authentication
+- **Individual user accounts** with personalized progress tracking
+- **JWT-based authentication** with secure password hashing
+- **User limit enforcement** (20 users maximum)
+- **Admin panel** for user management
 
-### 🎯 Exam Simulation
-- **Full-length Practice Exams** (75 questions, 180 minutes)
-- **Realistic Exam Environment** with timer and navigation
-- **Detailed Score Reports** with domain breakdown
-- **Performance Analytics** and improvement recommendations
-- **Multiple Exam Attempts** with progress tracking
+### **Comprehensive Study Tools**
+- **529+ Practice Questions** with detailed explanations
+- **Full Exam Simulation** (75 questions, 180 minutes)
+- **AWS Flashcards** for quick concept reinforcement
+- **Domain-specific Progress Tracking** across 5 SAP-C02 domains
+- **Question Status Management** (New, Practicing, Mastered, Needs Review)
 
-### 📊 Analytics Dashboard
-- **Performance Trends** over time
-- **Domain Mastery Analysis** with weak area identification
-- **Study Time Tracking** and recommendations
-- **Readiness Score** calculation
-- **Historical Progress** visualization
+### **Advanced Analytics**
+- **Personal Progress Dashboard** with visual progress indicators
+- **Study Time Tracking** and accuracy metrics
+- **Domain-wise Performance Analysis**
+- **Question Status Overview** with smart recommendations
 
-### 🌐 AWS Services Reference
-- **Comprehensive Service Guide** with 20+ AWS services
-- **Multi-Cloud Comparisons** (AWS, Azure, GCP, Alibaba Cloud)
-- **Service Categories** organized by domain
-- **Exam-Focused Tips** and insights
-- **Service Limits** and pricing information
-- **Integration Patterns** and use cases
+## 🏗️ Architecture
 
-### 👨‍💼 Cloud Solution Architect Guide
-- **Core Competencies** (Technical, Soft Skills, Business Acumen)
-- **Methodologies & Frameworks** (Well-Architected, Design Patterns)
-- **Tools & Technologies** (IaC, Monitoring, Diagramming)
-- **Domain Expertise** (Security, Data Architecture)
-- **Career Development** (Certifications, Learning Paths)
-- **Vendor-Neutral Content** covering all major cloud platforms
+### **Frontend**
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **Tailwind CSS** for responsive styling
+- **Zustand** for state management
+- **React Router** for navigation
 
-## 🛠️ Technology Stack
+### **Backend**
+- **Vercel Serverless Functions** for API endpoints
+- **Upstash Redis** for data persistence
+- **JWT Authentication** with bcrypt password hashing
+- **ES Modules** for modern JavaScript compatibility
 
-- **Frontend**: React 18 with TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Routing**: React Router v6
-- **Icons**: Lucide React
-- **Build Tool**: Vite
-- **Package Manager**: npm
-
-## 📋 Prerequisites
-
-- Node.js 18+ 
-- npm 8+
-
-## 🚀 Getting Started
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Jeffrey-Xu/aws-sap-c02-exam-app.git
-   cd aws-sap-c02-exam-app
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
-
-## 📖 Usage Guide
-
-### Practice Mode
-1. Navigate to the **Practice** tab
-2. Select a domain or choose "All Domains"
-3. Answer questions and receive immediate feedback
-4. Track your progress in the Analytics dashboard
-
-### Exam Simulation
-1. Go to the **Exam Sim** tab
-2. Start a full-length practice exam
-3. Complete all 75 questions within 180 minutes
-4. Review your detailed score report
-5. Identify areas for improvement
-
-### AWS Reference
-1. Visit the **AWS Reference** tab
-2. Browse services by category
-3. Search for specific services
-4. Compare with other cloud providers
-5. Study exam-specific tips and limits
-
-### Architect Guide
-1. Access the **Architect Guide** tab
-2. Explore different competency areas
-3. Follow learning paths and checklists
-4. Use recommended tools and resources
-
-## 📊 Exam Domains Covered
-
-- **Domain 1**: Design Solutions for Organizational Complexity (26%)
-- **Domain 2**: Design for New Solutions (29%)
-- **Domain 3**: Continuous Improvement for Existing Solutions (25%)
-- **Domain 4**: Accelerate Workload Migration and Modernization (20%)
-
-## 🎯 Key Features
-
-### Smart Question Distribution
-- Questions are distributed according to official SAP-C02 exam weightings
-- Adaptive difficulty based on your performance
-- Comprehensive coverage of all exam objectives
-
-### Progress Persistence
-- Your progress is automatically saved locally
-- Resume practice sessions anytime
-- Historical data for long-term tracking
-
-### Comprehensive Analytics
-- Detailed performance metrics
-- Weak area identification
-- Study recommendations
-- Readiness assessment
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript compiler
-
-### Project Structure
-
+### **Database Schema**
 ```
-src/
-├── components/          # Reusable UI components
-│   ├── common/         # Generic components
-│   ├── exam/           # Exam-specific components
-│   ├── analytics/      # Analytics components
-│   └── layout/         # Layout components
-├── data/               # Static data and content
-├── pages/              # Page components
-├── stores/             # Zustand state stores
-├── types/              # TypeScript type definitions
-├── utils/              # Utility functions
-└── constants/          # Application constants
+Users: {
+  id: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+  passwordHash: string,
+  createdAt: string,
+  lastLoginAt: string
+}
+
+Progress: {
+  userId: string,
+  questionProgress: object,
+  examAttempts: array,
+  studyTime: number,
+  lastActivity: string
+}
 ```
+
+## 🛠️ API Endpoints
+
+### **Authentication**
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user profile
+
+### **Admin**
+- `GET /api/admin/users` - List all users (admin only)
+
+### **Progress**
+- `POST /api/progress/save` - Save user progress
+- `GET /api/progress/load` - Load user progress
+
+## 🔧 Environment Variables
+
+```env
+# Upstash Redis (Required for production)
+KV_REST_API_URL=your_upstash_redis_url
+KV_REST_API_TOKEN=your_upstash_redis_token
+
+# JWT Secret (Required for authentication)
+JWT_SECRET=your_jwt_secret_key
+
+# Optional fallback Redis variables
+UPSTASH_REDIS_REST_URL=your_upstash_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
+```
+
+## 🚀 Deployment
+
+### **Vercel Deployment**
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### **Environment Setup**
+1. Create Upstash Redis database
+2. Set environment variables
+3. Deploy to Vercel
+
+## 👥 User Management
+
+### **Admin Access**
+- Username: `admin`
+- Password: `nimda`
+- Access admin panel at `/admin`
+
+### **User Limits**
+- Maximum 20 users supported
+- Automatic user limit enforcement
+- Admin can view and manage all users
+
+## 📊 Progress Tracking
+
+### **Question Status System**
+- **New**: Questions not yet attempted
+- **Practicing**: Answered correctly, needs more practice
+- **Mastered**: Answered correctly 3+ times or manually marked
+- **Needs Review**: Answered incorrectly or marked for review
+
+### **Domain Coverage**
+1. Design Solutions for Organizational Complexity
+2. Design for New Solutions  
+3. Migration Planning
+4. Cost Control
+5. Continuous Improvement for Existing Solutions
+
+## 🔒 Security Features
+
+- **Password Hashing**: bcrypt with salt
+- **JWT Tokens**: 7-day expiration
+- **Input Validation**: Comprehensive server-side validation
+- **CORS Protection**: Configured for security
+- **Admin Authentication**: Separate admin credentials
+
+## 🎯 Study Recommendations
+
+1. **Start with "Needs Review"** questions to address weak areas
+2. **Progress through "New"** questions systematically
+3. **Use Flashcards** for quick concept reinforcement
+4. **Take Full Exams** to simulate real test conditions
+5. **Track Domain Progress** to ensure comprehensive coverage
+
+## 📱 Responsive Design
+
+- **Mobile-first approach** with responsive navigation
+- **Touch-friendly interface** for mobile devices
+- **Optimized layouts** for all screen sizes
+- **Progressive Web App** capabilities
+
+## 🔄 Development
+
+### **Local Development**
+```bash
+npm install
+npm run dev
+```
+
+### **Building**
+```bash
+npm run build
+npm run preview
+```
+
+### **Code Structure**
+```
+├── api/                 # Vercel serverless functions
+│   ├── auth/           # Authentication endpoints
+│   ├── admin/          # Admin management
+│   └── progress/       # Progress tracking
+├── lib/                # Shared utilities
+│   └── db.js          # Database operations
+├── src/               # React application
+│   ├── components/    # Reusable components
+│   ├── pages/         # Page components
+│   ├── services/      # API services
+│   └── stores/        # State management
+└── public/            # Static assets
+```
+
+## 📈 Performance
+
+- **Fast Loading**: Optimized with Vite and code splitting
+- **Efficient Caching**: Redis for fast data access
+- **Serverless Architecture**: Scales automatically
+- **CDN Distribution**: Global content delivery via Vercel
+
+## 🐛 Troubleshooting
+
+### **Common Issues**
+1. **Environment Variables**: Ensure all required variables are set
+2. **Redis Connection**: Verify Upstash Redis credentials
+3. **User Limit**: Check if 20-user limit has been reached
+4. **JWT Errors**: Verify JWT_SECRET is properly configured
+
+### **Debug Mode**
+Set `NODE_ENV=development` for detailed error messages.
+
+## 📄 License
+
+This project is for educational purposes. AWS and SAP-C02 are trademarks of Amazon Web Services.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- AWS for providing comprehensive documentation and exam guides
-- The cloud community for sharing knowledge and best practices
-- All contributors who help improve this application
-
-## 📞 Support
-
-If you have any questions or need help with the application:
-
-1. Check the [Issues](https://github.com/Jeffrey-Xu/aws-sap-c02-exam-app/issues) page
-2. Create a new issue if your question isn't already addressed
-3. Provide detailed information about your problem
-
-## 🎯 Exam Tips
-
-- **Practice Regularly**: Consistent daily practice is more effective than cramming
-- **Understand Concepts**: Focus on understanding rather than memorization
-- **Use All Features**: Combine practice questions, simulations, and reference materials
-- **Track Progress**: Monitor your improvement over time
-- **Review Mistakes**: Learn from incorrect answers and explanations
-- **Time Management**: Practice with the exam timer to build time management skills
-
-Good luck with your AWS SAP-C02 exam preparation! 🚀
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ---
 
-**Disclaimer**: This application is not affiliated with Amazon Web Services (AWS). It is an independent study tool created to help with exam preparation.
-# Trigger deployment after adding JWT_SECRET environment variable
-# Deployment trigger for testing server-side user management - Tue  8 Jul 2025 11:47:14 CST
+**Built with ❤️ for AWS certification success**

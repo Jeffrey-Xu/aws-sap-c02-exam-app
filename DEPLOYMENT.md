@@ -1,284 +1,198 @@
 # 🚀 Deployment Guide
 
-This guide covers multiple deployment options for your AWS SAP-C02 Exam Preparation App.
+Complete guide for deploying the AWS SAP-C02 Exam Prep Platform with server-side user management.
 
 ## 📋 Prerequisites
 
-- Node.js 18+ installed
-- Project built successfully (`npm run build`)
-- Git repository pushed to GitHub
+- GitHub account
+- Vercel account
+- Upstash account (for Redis database)
 
-## 🌟 Recommended: Vercel (Easiest)
+## 🗄️ Database Setup (Upstash Redis)
 
-### Option A: Web Interface
-1. Go to [vercel.com](https://vercel.com)
-2. Sign in with GitHub
-3. Click "Import Project"
-4. Select your `aws-sap-c02-exam-app` repository
-5. Click "Deploy" (zero configuration needed!)
-6. Get your live URL: `https://aws-sap-c02-exam-app.vercel.app`
+### **Step 1: Create Upstash Redis Database**
+1. Go to [Upstash Console](https://console.upstash.com/)
+2. Create a new Redis database
+3. Choose your preferred region
+4. Copy the REST API credentials:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
 
-### Option B: CLI Deployment
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy from project root
-cd /path/to/aws-sap-c02-exam-app
-vercel
-
-# Follow prompts:
-# - Link to existing project? No
-# - Project name: aws-sap-c02-exam-app
-# - Directory: ./
-# - Override settings? No
+### **Step 2: Note Your Credentials**
+```env
+KV_REST_API_URL=https://your-redis-url.upstash.io
+KV_REST_API_TOKEN=your-redis-token
+JWT_SECRET=your-secure-jwt-secret-key
 ```
 
-**✅ Benefits:**
-- Automatic HTTPS
-- Global CDN
-- Auto-deploy on Git push
-- Custom domains
-- Free tier available
+## 🌐 Vercel Deployment
+
+### **Step 1: Connect Repository**
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "New Project"
+3. Import your GitHub repository
+4. Select the repository: `aws-sap-c02-exam-app`
+
+### **Step 2: Configure Environment Variables**
+In Vercel project settings, add these environment variables:
+
+```env
+# Required: Upstash Redis
+KV_REST_API_URL=https://your-redis-url.upstash.io
+KV_REST_API_TOKEN=your-redis-token
+
+# Required: JWT Authentication
+JWT_SECRET=your-secure-random-string-min-32-chars
+
+# Optional: Fallback Redis variables
+UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
+```
+
+### **Step 3: Deploy**
+1. Click "Deploy"
+2. Wait for build to complete
+3. Your app will be available at `https://your-app.vercel.app`
+
+## ✅ Post-Deployment Verification
+
+### **Test User Registration**
+1. Visit your deployed app
+2. Click "Sign up here"
+3. Create a test account
+4. Verify successful login and dashboard access
+
+### **Test Admin Panel**
+1. Go to `/admin`
+2. Login with:
+   - Username: `admin`
+   - Password: `nimda`
+3. Verify user list displays
+
+### **Test API Endpoints**
+```bash
+# Test registration
+curl -X POST https://your-app.vercel.app/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Test","lastName":"User","email":"test@example.com","password":"TestPass123!","confirmPassword":"TestPass123!"}'
+
+# Test login
+curl -X POST https://your-app.vercel.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPass123!"}'
+```
+
+## 🔧 Configuration Options
+
+### **User Limits**
+- Default: 20 users maximum
+- Modify in `lib/db.js` if needed
+- Enforced server-side
+
+### **JWT Token Expiration**
+- Default: 7 days
+- Modify in `lib/db.js`:
+```javascript
+const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+```
+
+### **Admin Credentials**
+- Default: admin/nimda
+- Modify in `lib/db.js`:
+```javascript
+if (username === 'admin' && password === 'nimda') {
+```
+
+## 🐛 Troubleshooting
+
+### **Build Errors**
+```bash
+# Check build logs in Vercel dashboard
+# Common issues:
+# 1. Missing environment variables
+# 2. Import/export syntax errors
+# 3. Missing dependencies
+```
+
+### **Runtime Errors**
+```bash
+# Check Function logs in Vercel dashboard
+# Common issues:
+# 1. Redis connection failed
+# 2. JWT secret not set
+# 3. Invalid environment variables
+```
+
+### **Database Connection Issues**
+1. Verify Upstash Redis is active
+2. Check environment variables are correct
+3. Test Redis connection in Upstash console
+
+### **Authentication Issues**
+1. Verify JWT_SECRET is set and consistent
+2. Check token expiration settings
+3. Clear browser localStorage if needed
+
+## 📊 Monitoring
+
+### **Vercel Analytics**
+- Enable in Vercel dashboard
+- Monitor performance and usage
+- Track function invocations
+
+### **Upstash Monitoring**
+- Monitor Redis usage in Upstash console
+- Check connection metrics
+- Monitor storage usage
+
+## 🔄 Updates and Maintenance
+
+### **Automatic Deployments**
+- Push to `main` branch triggers deployment
+- Vercel builds and deploys automatically
+- Zero-downtime deployments
+
+### **Database Maintenance**
+- Upstash handles Redis maintenance
+- Automatic backups and scaling
+- Monitor storage limits
+
+### **Security Updates**
+- Keep dependencies updated
+- Monitor for security advisories
+- Regular JWT secret rotation recommended
+
+## 📈 Scaling Considerations
+
+### **User Growth**
+- Current limit: 20 users
+- Increase limit in code if needed
+- Monitor Redis storage usage
+
+### **Performance Optimization**
+- Vercel Edge Functions for global performance
+- Redis caching for fast data access
+- CDN for static assets
+
+## 🔒 Security Best Practices
+
+### **Environment Variables**
+- Never commit secrets to git
+- Use Vercel environment variables
+- Rotate secrets regularly
+
+### **Database Security**
+- Use Upstash Redis TLS encryption
+- Restrict access to necessary IPs only
+- Monitor access logs
+
+### **Application Security**
+- Strong JWT secrets (32+ characters)
+- Password hashing with bcrypt
+- Input validation on all endpoints
 
 ---
 
-## 🟦 Netlify
+**🎉 Your AWS SAP-C02 Exam Prep Platform is now live!**
 
-### Option A: Drag & Drop
-1. Build your project: `npm run build`
-2. Go to [netlify.com](https://netlify.com)
-3. Drag the `dist` folder to the deploy area
-4. Get instant URL
-
-### Option B: Git Integration
-1. Connect your GitHub repository
-2. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-3. Deploy automatically on push
-
-### Option C: CLI Deployment
-```bash
-# Install Netlify CLI
-npm i -g netlify-cli
-
-# Build and deploy
-npm run build
-netlify deploy --prod --dir=dist
-```
-
----
-
-## ☁️ AWS (Perfect for AWS Exam Content!)
-
-### Automated Deployment
-Use the provided script for complete AWS setup:
-
-```bash
-# Make sure AWS CLI is configured
-aws configure
-
-# Run deployment script
-./deploy-aws.sh
-```
-
-This creates:
-- **S3 Bucket** for static hosting
-- **CloudFront Distribution** for global CDN
-- **Proper routing** for React Router
-
-### Manual AWS Deployment
-
-#### Step 1: Create S3 Bucket
-```bash
-# Create bucket (replace with unique name)
-aws s3 mb s3://your-unique-bucket-name
-
-# Enable static website hosting
-aws s3 website s3://your-unique-bucket-name \
-  --index-document index.html \
-  --error-document index.html
-```
-
-#### Step 2: Set Bucket Policy
-```bash
-# Create bucket policy for public access
-cat > bucket-policy.json << 'EOF'
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::your-unique-bucket-name/*"
-        }
-    ]
-}
-EOF
-
-aws s3api put-bucket-policy --bucket your-unique-bucket-name --policy file://bucket-policy.json
-```
-
-#### Step 3: Upload Files
-```bash
-# Build and upload
-npm run build
-aws s3 sync dist/ s3://your-unique-bucket-name --delete
-```
-
-#### Step 4: Create CloudFront Distribution (Optional)
-- Go to AWS Console → CloudFront
-- Create distribution with S3 origin
-- Set error pages to redirect to `index.html`
-
----
-
-## 🟣 GitHub Pages
-
-### Automatic Deployment
-The included GitHub Actions workflow (`.github/workflows/deploy.yml`) automatically deploys to GitHub Pages on every push to main.
-
-### Enable GitHub Pages
-1. Go to your repository settings
-2. Scroll to "Pages" section
-3. Source: "Deploy from a branch"
-4. Branch: `gh-pages`
-5. Your app will be available at: `https://jeffrey-xu.github.io/aws-sap-c02-exam-app`
-
-### Manual GitHub Pages
-```bash
-# Install gh-pages
-npm i -D gh-pages
-
-# Add to package.json scripts:
-"deploy": "gh-pages -d dist"
-
-# Build and deploy
-npm run build
-npm run deploy
-```
-
----
-
-## 🔧 Other Cloud Options
-
-### Google Cloud Platform
-```bash
-# Install Google Cloud SDK
-# Enable Cloud Storage and Cloud CDN
-
-# Create bucket
-gsutil mb gs://your-bucket-name
-
-# Upload files
-npm run build
-gsutil -m cp -r dist/* gs://your-bucket-name
-
-# Make bucket public
-gsutil iam ch allUsers:objectViewer gs://your-bucket-name
-```
-
-### Azure Static Web Apps
-1. Go to Azure Portal
-2. Create "Static Web App"
-3. Connect to GitHub repository
-4. Build settings:
-   - App location: `/`
-   - Build location: `dist`
-   - Build command: `npm run build`
-
-### DigitalOcean App Platform
-1. Go to DigitalOcean Control Panel
-2. Create new App
-3. Connect GitHub repository
-4. Configure build settings
-5. Deploy automatically
-
----
-
-## 🎯 Deployment Comparison
-
-| Platform | Cost | Ease | Features | Best For |
-|----------|------|------|----------|----------|
-| **Vercel** | Free tier | ⭐⭐⭐⭐⭐ | Auto-deploy, CDN, Analytics | **Recommended** |
-| **Netlify** | Free tier | ⭐⭐⭐⭐⭐ | Forms, Functions, Split testing | Great alternative |
-| **AWS** | Pay-as-go | ⭐⭐⭐ | Full control, Learning AWS | **Perfect for AWS exam prep** |
-| **GitHub Pages** | Free | ⭐⭐⭐⭐ | Simple, Git integration | Open source projects |
-| **Azure** | Free tier | ⭐⭐⭐ | Microsoft ecosystem | Enterprise |
-| **GCP** | Free tier | ⭐⭐⭐ | Google services | Google ecosystem |
-
----
-
-## 🔒 Custom Domain Setup
-
-### For Vercel/Netlify
-1. Buy domain from registrar
-2. Add domain in platform settings
-3. Update DNS records as instructed
-4. Automatic HTTPS certificate
-
-### For AWS
-1. Register domain in Route 53 (or external)
-2. Create hosted zone
-3. Point CloudFront distribution
-4. Request SSL certificate in Certificate Manager
-
----
-
-## 📊 Performance Optimization
-
-### Build Optimization
-```bash
-# Analyze bundle size
-npm run build
-npx vite-bundle-analyzer dist
-
-# Optimize images and assets
-# Enable gzip compression
-# Use CDN for static assets
-```
-
-### Caching Headers
-Most platforms handle this automatically, but for custom setups:
-- HTML: No cache or short cache
-- JS/CSS: Long cache with versioning
-- Images: Long cache
-
----
-
-## 🚨 Troubleshooting
-
-### React Router Issues
-If you get 404 errors on refresh:
-- **Vercel**: Add `vercel.json` with rewrites
-- **Netlify**: Add `_redirects` file
-- **AWS**: Configure CloudFront error pages
-- **GitHub Pages**: Use hash router instead
-
-### Build Failures
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-
-# Check Node.js version
-node --version  # Should be 18+
-
-# Build locally first
-npm run build
-```
-
----
-
-## 🎯 Recommendation
-
-**For your AWS SAP-C02 exam app, I recommend:**
-
-1. **Start with Vercel** - Get online quickly and easily
-2. **Then try AWS** - Practice what you're learning for the exam
-3. **Use GitHub Pages** - For open source sharing
-
-This gives you experience with multiple cloud platforms while keeping your app accessible to exam candidates worldwide! 🌍
+For support, check the main README.md or create an issue in the repository.
