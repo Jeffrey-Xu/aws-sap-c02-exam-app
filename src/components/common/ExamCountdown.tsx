@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Calendar, Clock, AlertTriangle } from 'lucide-react';
 
 interface ExamCountdownProps {
@@ -72,7 +73,15 @@ const ExamCountdown: React.FC<ExamCountdownProps> = ({ examDate, className = '' 
           <Calendar className="w-5 h-5 text-blue-600" />
           <div>
             <h3 className="font-medium text-blue-900">Schedule Your Exam</h3>
-            <p className="text-sm text-blue-700">Set your exam date to track your preparation progress</p>
+            <p className="text-sm text-blue-700">
+              Set your exam date to track your preparation progress in{' '}
+              <Link 
+                to="/settings" 
+                className="text-blue-600 hover:text-blue-800 underline font-medium"
+              >
+                settings
+              </Link>
+            </p>
           </div>
         </div>
       </div>

@@ -274,7 +274,7 @@ const SettingsPage: React.FC = () => {
               min={new Date().toISOString().split('T')[0]}
             />
             <p className="mt-1 text-sm text-gray-500">
-              Set your exam date to track your preparation progress with a countdown timer
+              Set your exam date to track your preparation progress in settings with a countdown timer
             </p>
           </div>
           
