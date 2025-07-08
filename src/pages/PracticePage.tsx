@@ -39,36 +39,7 @@ const PracticePage: React.FC = () => {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendedQuestions, setRecommendedQuestions] = useState<typeof questions>([]);
   
-  useEffect(() => {
-    if (questions.length === 0 && !loading) {
-      console.log('🔄 Loading questions...');
-      loadQuestions();
-    }
-    
-    // Check URL parameters for flashcard mode
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'flashcards') {
-      setShowFlashcards(true);
-    }
-  }, [questions.length, loading, loadQuestions]);
-  
-  // Debug logging
-  useEffect(() => {
-    console.log('📊 PracticePage state:', {
-      questionsCount: questions.length,
-      loading,
-      filteredCount: filteredQuestions.length,
-      currentIndex: currentQuestionIndex
-    });
-  }, [questions.length, loading, filteredQuestions.length, currentQuestionIndex]);
-  
-  useEffect(() => {
-    // Reset to first question when filters change
-    setCurrentQuestionIndex(0);
-    setShowExplanation(false);
-  }, [filteredQuestions]);
-  
-  // Apply filters with progress data for bookmarks
+  // Apply filters with progress data for bookmarks - MOVED UP
   const filteredQuestions = React.useMemo(() => {
     return questions.filter(question => {
       // Category filter
@@ -108,6 +79,35 @@ const PracticePage: React.FC = () => {
       return true;
     });
   }, [questions, filters, questionProgress]);
+  
+  useEffect(() => {
+    if (questions.length === 0 && !loading) {
+      console.log('🔄 Loading questions...');
+      loadQuestions();
+    }
+    
+    // Check URL parameters for flashcard mode
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'flashcards') {
+      setShowFlashcards(true);
+    }
+  }, [questions.length, loading, loadQuestions]);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('📊 PracticePage state:', {
+      questionsCount: questions.length,
+      loading,
+      filteredCount: filteredQuestions.length,
+      currentIndex: currentQuestionIndex
+    });
+  }, [questions.length, loading, filteredQuestions.length, currentQuestionIndex]);
+  
+  useEffect(() => {
+    // Reset to first question when filters change
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+  }, [filteredQuestions]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
   

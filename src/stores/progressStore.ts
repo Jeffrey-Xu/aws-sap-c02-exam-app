@@ -506,6 +506,37 @@ export const useProgressStore = create<ProgressStore>()(
         };
       },
 
+      switchUser: (userId: string) => {
+        // Save current user's progress before switching
+        const currentState = get();
+        if (Object.keys(currentState.questionProgress).length > 0) {
+          // Save current progress to storage
+          saveUserProgressToStorage(userId, {
+            questionProgress: currentState.questionProgress,
+            totalQuestions: currentState.totalQuestions,
+            masteredQuestions: currentState.masteredQuestions,
+            categoryProgress: currentState.categoryProgress,
+            studyStreak: currentState.studyStreak,
+            totalStudyTime: currentState.totalStudyTime,
+            examAttempts: currentState.examAttempts,
+            lastStudied: currentState.lastStudied
+          });
+        }
+        
+        // Load new user's progress
+        const newUserData = loadUserProgressFromStorage(userId);
+        set({
+          questionProgress: newUserData.questionProgress || {},
+          totalQuestions: newUserData.totalQuestions || 0,
+          masteredQuestions: newUserData.masteredQuestions || 0,
+          categoryProgress: newUserData.categoryProgress || {} as Record<ExamDomain, CategoryProgress>,
+          studyStreak: newUserData.studyStreak || 0,
+          totalStudyTime: newUserData.totalStudyTime || 0,
+          examAttempts: newUserData.examAttempts || [],
+          lastStudied: newUserData.lastStudied
+        });
+      },
+
     }),
     {
       name: 'progress-store',
