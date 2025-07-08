@@ -69,10 +69,6 @@ const HomePage: React.FC = () => {
         return acc;
       }, {} as Record<keyof typeof DOMAIN_INFO, number>);
       
-      // Debug: Log the actual counts
-      console.log('Domain question counts:', questionsByCategory);
-      console.log('Total questions:', questions.length);
-      
       calculateProgress(questions.length, questionsByCategory);
     }
   }, [questions, calculateProgress]);
