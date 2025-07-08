@@ -357,15 +357,14 @@ const HomePage: React.FC = () => {
       <Card>
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Domain Progress</h3>
-          <p className="text-sm text-gray-600 mt-1">Track your progress across all exam domains</p>
+          <p className="text-sm text-gray-600 mt-1">Your mastery progress across all exam domains</p>
         </div>
         <div className="space-y-3">
           {Object.entries(DOMAIN_INFO).map(([domain, info]) => {
             const progress = categoryProgress[domain as keyof typeof categoryProgress];
-            const attemptedQuestions = progress?.attemptedQuestions || 0;
             const totalQuestions = progress?.totalQuestions || 1;
             const masteredQuestions = progress?.masteredQuestions || 0;
-            const percentage = safePercentage(attemptedQuestions, totalQuestions);
+            const attemptedQuestions = progress?.attemptedQuestions || 0;
             const masteryPercentage = safePercentage(masteredQuestions, totalQuestions);
             
             return (
@@ -373,22 +372,22 @@ const HomePage: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-900">{info.name}</span>
                   <div className="text-right">
-                    <span className="text-sm font-semibold text-gray-900">{percentage}%</span>
+                    <span className="text-sm font-semibold text-gray-900">{masteryPercentage}%</span>
                     <div className="text-xs text-gray-500">
-                      {attemptedQuestions} / {totalQuestions} attempted
+                      {masteredQuestions} / {totalQuestions} mastered
                     </div>
                   </div>
                 </div>
                 <ProgressBar
-                  value={attemptedQuestions}
+                  value={masteredQuestions}
                   max={totalQuestions}
-                  color={percentage >= 70 ? 'green' : percentage >= 50 ? 'orange' : 'red'}
+                  color={masteryPercentage >= 70 ? 'green' : masteryPercentage >= 30 ? 'orange' : 'red'}
                   size="sm"
                 />
-                {masteredQuestions > 0 && (
-                  <div className="text-xs text-green-600 flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    {masteredQuestions} mastered ({masteryPercentage}%)
+                {attemptedQuestions > masteredQuestions && (
+                  <div className="text-xs text-blue-600 flex items-center">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {attemptedQuestions - masteredQuestions} in progress
                   </div>
                 )}
               </div>
