@@ -436,5 +436,4 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-// Force deployment Tue  8 Jul 2025 17:44:02 CST
 // Force mastery display Tue  8 Jul 2025 17:52:20 CST
