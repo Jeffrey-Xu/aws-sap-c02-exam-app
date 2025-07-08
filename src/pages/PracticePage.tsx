@@ -82,6 +82,62 @@ const PracticePage: React.FC = () => {
       return true;
     });
   }, [questions, filters, questionProgress]);
+
+  // Determine which questions to display: recommended questions take priority over filtered questions
+  const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
+  const currentQuestion = displayQuestions[currentQuestionIndex];
+  
+  const handleAnswer = useCallback((answer: string, timeSpent: number) => {
+    if (!currentQuestion) return;
+    
+    const isCorrect = answer === currentQuestion.correct_answer;
+    const questionDomain = categorizeQuestion(currentQuestion);
+    updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent, questionDomain);
+    setShowExplanation(true);
+  }, [currentQuestion, updateQuestionProgress]);
+  
+  const handleNext = useCallback(() => {
+    if (currentQuestionIndex < displayQuestions.length - 1) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev + 1);
+        setShowExplanation(false);
+        setIsTransitioning(false);
+      }, 150);
+    }
+  }, [currentQuestionIndex, displayQuestions.length]);
+  
+  const handlePrevious = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev - 1);
+        setShowExplanation(false);
+        setIsTransitioning(false);
+      }, 150);
+    }
+  }, [currentQuestionIndex]);
+  
+  const handleStartRecommendedSession = useCallback((questions: typeof filteredQuestions, sessionType: string) => {
+    setRecommendedQuestions(questions);
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+    setShowRecommendations(false);
+  }, []);
+  
+  const handleExitRecommendedSession = useCallback(() => {
+    setRecommendedQuestions([]);
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+  }, []);
+  
+  const handleStartFlashcards = useCallback(() => {
+    setShowFlashcards(true);
+  }, []);
+  
+  const handleExitFlashcards = useCallback(() => {
+    setShowFlashcards(false);
+  }, []);
   
   useEffect(() => {
     if (questions.length === 0 && !loading) {
