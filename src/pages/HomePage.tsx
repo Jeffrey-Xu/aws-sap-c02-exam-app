@@ -4,6 +4,7 @@ import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, Aler
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
 import ExamCountdown from '../components/common/ExamCountdown';
+import PageLoader from '../components/common/PageLoader';
 import { useQuestionStore } from '../stores/questionStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useServerAuthStore } from '../stores/serverAuthStore';
@@ -100,9 +101,10 @@ const HomePage: React.FC = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aws-orange"></div>
-      </div>
+      <PageLoader 
+        text="Loading Dashboard" 
+        subText="Preparing your study progress and exam insights..."
+      />
     );
   }
   

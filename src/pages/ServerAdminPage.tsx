@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Users, BarChart3, Clock, Trophy, Target, Eye, EyeOff, Download, RefreshCw, Trash2 } from 'lucide-react';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { TableSkeleton } from '../components/common/SkeletonLoader';
 import { formatTime } from '../utils/questionUtils';
 import { apiService } from '../services/api';
 
@@ -360,9 +362,14 @@ const ServerAdminPage: React.FC = () => {
             )}
             
             {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">Loading user data from server...</p>
+              <div className="space-y-4">
+                <div className="text-center py-4">
+                  <LoadingSpinner 
+                    size="md" 
+                    text="Loading user data from server..." 
+                  />
+                </div>
+                <TableSkeleton rows={3} cols={11} />
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-8">

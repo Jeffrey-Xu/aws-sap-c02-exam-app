@@ -3,6 +3,7 @@ import { ArrowLeft, Download, Trash2, Upload, User, Mail, Shield, RotateCcw, Sav
 import { Link } from 'react-router-dom';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { useProgressStore } from '../stores/progressStore';
 import { useServerAuthStore } from '../stores/serverAuthStore';
@@ -295,7 +296,11 @@ const SettingsPage: React.FC = () => {
               disabled={isUpdatingProfile}
               className="flex items-center"
             >
-              <Save size={16} className="mr-2" />
+              {isUpdatingProfile ? (
+                <LoadingSpinner size="sm" className="mr-2" />
+              ) : (
+                <Save size={16} className="mr-2" />
+              )}
               {isUpdatingProfile ? 'Updating...' : 'Update Profile'}
             </Button>
           </div>

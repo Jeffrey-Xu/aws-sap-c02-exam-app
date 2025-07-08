@@ -7,6 +7,8 @@ import SmartRecommendations from '../components/practice/SmartRecommendations';
 import FlashcardMode from '../components/study/FlashcardMode';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import PageLoader from '../components/common/PageLoader';
+import { QuestionSkeleton } from '../components/common/SkeletonLoader';
 import { useQuestionStore } from '../stores/questionStore';
 import { categorizeQuestion } from '../utils/questionUtils';
 import { useProgressStore } from '../stores/progressStore';
@@ -38,6 +40,7 @@ const PracticePage: React.FC = () => {
   const [showFlashcards, setShowFlashcards] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendedQuestions, setRecommendedQuestions] = useState<typeof questions>([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Apply filters with progress data for bookmarks - MOVED UP
   const filteredQuestions = React.useMemo(() => {
@@ -113,15 +116,23 @@ const PracticePage: React.FC = () => {
   
   const handleNext = () => {
     if (currentQuestionIndex < displayQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setShowExplanation(false);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev + 1);
+        setShowExplanation(false);
+        setIsTransitioning(false);
+      }, 150);
     }
   };
   
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-      setShowExplanation(false);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev - 1);
+        setShowExplanation(false);
+        setIsTransitioning(false);
+      }, 150);
     }
   };
   
@@ -170,9 +181,10 @@ const PracticePage: React.FC = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aws-orange"></div>
-      </div>
+      <PageLoader 
+        text="Loading Practice Questions" 
+        subText="Preparing your personalized study session..."
+      />
     );
   }
   
@@ -316,13 +328,19 @@ const PracticePage: React.FC = () => {
       {/* Current Question */}
       {currentQuestion ? (
         <div className="space-y-4">
-          <QuestionCard
-            question={currentQuestion}
-            onAnswer={handleAnswer}
-            showExplanation={showExplanation}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-          />
+          {isTransitioning ? (
+            <Card>
+              <QuestionSkeleton />
+            </Card>
+          ) : (
+            <QuestionCard
+              question={currentQuestion}
+              onAnswer={handleAnswer}
+              showExplanation={showExplanation}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+            />
+          )}
           
           {/* Additional Actions */}
         </div>

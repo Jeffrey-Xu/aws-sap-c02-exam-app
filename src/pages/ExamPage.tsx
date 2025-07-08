@@ -12,6 +12,7 @@ import ReviewDialog from '../components/exam/ReviewDialog';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import PageLoader from '../components/common/PageLoader';
 import { useQuestionStore } from '../stores/questionStore';
 import { useExamStore } from '../stores/examStore';
 import { useProgressStore } from '../stores/progressStore';
@@ -301,9 +302,10 @@ const ExamPage: React.FC = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aws-orange"></div>
-      </div>
+      <PageLoader 
+        text="Preparing Your Exam" 
+        subText="Loading 75 questions for your SAP-C02 practice exam..."
+      />
     );
   }
   
