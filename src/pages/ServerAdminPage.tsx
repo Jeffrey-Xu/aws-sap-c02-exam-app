@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, BarChart3, Clock, Trophy, Target, Eye, EyeOff, Download, RefreshCw } from 'lucide-react';
+import { Shield, Users, BarChart3, Clock, Trophy, Target, Eye, EyeOff, Download, RefreshCw, Trash2 } from 'lucide-react';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import { formatTime } from '../utils/questionUtils';
@@ -41,6 +41,8 @@ const ServerAdminPage: React.FC = () => {
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState<keyof UserMetrics>('lastActive');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [deleteConfirm, setDeleteConfirm] = useState<{show: boolean, user: UserMetrics | null}>({show: false, user: null});
+  const [deleting, setDeleting] = useState(false);
 
   // Check if already authenticated on mount
   useEffect(() => {
@@ -156,6 +158,63 @@ const ServerAdminPage: React.FC = () => {
     a.download = `aws-sap-c02-users-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  // Handle delete user confirmation
+  const handleDeleteUser = (user: UserMetrics) => {
+    setDeleteConfirm({ show: true, user });
+  };
+
+  // Confirm delete user
+  const confirmDeleteUser = async () => {
+    if (!deleteConfirm.user) return;
+    
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/admin/delete-user?userId=${deleteConfirm.user.userId}`, {
+        method: 'DELETE',
+        headers: {
+          'username': 'admin',
+          'password': 'nimda'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete user');
+      }
+
+      const result = await response.json();
+      
+      // Remove user from local state
+      setUsers(users.filter(u => u.userId !== deleteConfirm.user!.userId));
+      
+      // Update overall stats
+      if (overallStats) {
+        setOverallStats({
+          ...overallStats,
+          totalUsers: overallStats.totalUsers - 1,
+          activeUsers: deleteConfirm.user.isActive ? overallStats.activeUsers - 1 : overallStats.activeUsers
+        });
+      }
+      
+      // Close confirmation dialog
+      setDeleteConfirm({ show: false, user: null });
+      
+      // Show success message (you could add a toast notification here)
+      console.log(`User ${result.deletedUser.email} deleted successfully`);
+      
+    } catch (error) {
+      console.error('Delete user error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete user');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Cancel delete user
+  const cancelDeleteUser = () => {
+    setDeleteConfirm({ show: false, user: null });
   };
 
   if (!isAuthenticated) {
@@ -344,6 +403,7 @@ const ServerAdminPage: React.FC = () => {
                         Readiness {sortBy === 'readinessScore' && (sortOrder === 'desc' ? '↓' : '↑')}
                       </th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -386,6 +446,15 @@ const ServerAdminPage: React.FC = () => {
                             {user.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => handleDeleteUser(user)}
+                            className="inline-flex items-center px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                            title={`Delete ${user.firstName} ${user.lastName}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -395,6 +464,58 @@ const ServerAdminPage: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm.show && deleteConfirm.user && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900">Delete User</h3>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to delete the user <strong>{deleteConfirm.user.firstName} {deleteConfirm.user.lastName}</strong> ({deleteConfirm.user.email})?
+              </p>
+              <p className="text-sm text-red-600 mt-2">
+                This action cannot be undone. All user data and progress will be permanently deleted.
+              </p>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelDeleteUser}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50 flex items-center"
+              >
+                {deleting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete User
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
