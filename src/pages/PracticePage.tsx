@@ -340,6 +340,11 @@ const PracticePage: React.FC = () => {
       {/* Question Navigation */}
       {filteredQuestions.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3">
+          {/* TEST: Visible confirmation element */}
+          <div className="bg-green-100 border border-green-300 text-green-800 px-3 py-2 rounded text-sm">
+            🚀 Enhanced Navigation Features Active - Total Questions: {displayQuestions.length}
+          </div>
+          
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">
               Question {currentQuestionIndex + 1} of {displayQuestions.length}
