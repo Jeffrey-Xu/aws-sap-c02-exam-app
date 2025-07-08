@@ -96,7 +96,7 @@ const PracticePage: React.FC = () => {
     // Reset to first question when filters or recommended questions change
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
-  }, [filteredQuestions, recommendedQuestions]);
+  }, [filters, recommendedQuestions]);
 
   // Determine which questions to display: recommended questions take priority over filtered questions
   const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
