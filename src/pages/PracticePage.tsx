@@ -101,6 +101,46 @@ const PracticePage: React.FC = () => {
     setShowExplanation(false);
   }, [filters, recommendedQuestions]);
 
+  // Add keyboard shortcuts for navigation
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only handle shortcuts when not typing in input fields
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      switch (e.key) {
+        case 'ArrowLeft':
+        case 'h':
+          e.preventDefault();
+          if (currentQuestionIndex > 0) {
+            handlePrevious();
+          }
+          break;
+        case 'ArrowRight':
+        case 'l':
+          e.preventDefault();
+          if (currentQuestionIndex < displayQuestions.length - 1) {
+            handleNext();
+          }
+          break;
+        case 'j':
+          e.preventDefault();
+          // Focus on jump to position input
+          document.getElementById('jumpToPosition')?.focus();
+          break;
+        case 'f':
+          e.preventDefault();
+          // Focus on jump to ID input
+          document.getElementById('jumpToQuestionId')?.focus();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentQuestionIndex, displayQuestions.length, handleNext, handlePrevious]);
+
   // Determine which questions to display: recommended questions take priority over filtered questions
   const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
   const currentQuestion = displayQuestions[currentQuestionIndex];
@@ -299,28 +339,128 @@ const PracticePage: React.FC = () => {
       
       {/* Question Navigation */}
       {filteredQuestions.length > 0 && (
-        <div className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-sm text-gray-600">
-            Question {currentQuestionIndex + 1} of {displayQuestions.length}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Question {currentQuestionIndex + 1} of {displayQuestions.length}
+              {currentQuestion && (
+                <span className="text-gray-400 ml-2">(ID: #{currentQuestion.id})</span>
+              )}
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={currentQuestionIndex === displayQuestions.length - 1}
+              >
+                Next
+              </Button>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNext}
-              disabled={currentQuestionIndex === displayQuestions.length - 1}
-            >
-              Next
-            </Button>
+          {/* Quick Jump Navigation */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center space-x-6">
+              {/* Jump by Position */}
+              <div className="flex items-center space-x-2">
+                <label htmlFor="jumpToPosition" className="text-sm text-gray-600">
+                  Jump to position:
+                </label>
+                <input
+                  id="jumpToPosition"
+                  type="number"
+                  min="1"
+                  max={displayQuestions.length}
+                  placeholder="1"
+                  className="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-aws-orange focus:border-transparent"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const questionNum = parseInt((e.target as HTMLInputElement).value);
+                      if (questionNum >= 1 && questionNum <= displayQuestions.length) {
+                        setCurrentQuestionIndex(questionNum - 1);
+                        setShowExplanation(false);
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('jumpToPosition') as HTMLInputElement;
+                    const questionNum = parseInt(input.value);
+                    if (questionNum >= 1 && questionNum <= displayQuestions.length) {
+                      setCurrentQuestionIndex(questionNum - 1);
+                      setShowExplanation(false);
+                      input.value = '';
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-aws-orange text-white rounded hover:bg-aws-orange-dark transition-colors"
+                >
+                  Go
+                </button>
+              </div>
+              
+              {/* Jump by Question ID */}
+              <div className="flex items-center space-x-2">
+                <label htmlFor="jumpToQuestionId" className="text-sm text-gray-600">
+                  Jump to ID #:
+                </label>
+                <input
+                  id="jumpToQuestionId"
+                  type="number"
+                  min="1"
+                  placeholder="123"
+                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-aws-orange focus:border-transparent"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const questionId = parseInt((e.target as HTMLInputElement).value);
+                      const foundIndex = displayQuestions.findIndex(q => q.id === questionId);
+                      if (foundIndex !== -1) {
+                        setCurrentQuestionIndex(foundIndex);
+                        setShowExplanation(false);
+                        (e.target as HTMLInputElement).value = '';
+                      } else {
+                        alert(`Question ID #${questionId} not found in current filtered results.`);
+                      }
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('jumpToQuestionId') as HTMLInputElement;
+                    const questionId = parseInt(input.value);
+                    const foundIndex = displayQuestions.findIndex(q => q.id === questionId);
+                    if (foundIndex !== -1) {
+                      setCurrentQuestionIndex(foundIndex);
+                      setShowExplanation(false);
+                      input.value = '';
+                    } else {
+                      alert(`Question ID #${questionId} not found in current filtered results.`);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                >
+                  Find
+                </button>
+              </div>
+            </div>
+            
+            {/* Keyboard Shortcuts Help */}
+            <div className="text-xs text-gray-500">
+              <span className="hidden sm:inline">
+                Shortcuts: ← → (or H L) = Navigate | J = Jump to position | F = Find by ID
+              </span>
+            </div>
           </div>
         </div>
       )}

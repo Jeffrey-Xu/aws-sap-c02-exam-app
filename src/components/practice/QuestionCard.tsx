@@ -125,6 +125,19 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               {question.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </div>
           )}
+          {/* Status Label */}
+          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            questionProgress.status === 'mastered' ? 'bg-green-100 text-green-800' :
+            questionProgress.status === 'practicing' ? 'bg-blue-100 text-blue-800' :
+            questionProgress.status === 'needs-review' ? 'bg-red-100 text-red-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {questionProgress.status === 'mastered' && <CheckCircle size={10} className="mr-1" />}
+            {questionProgress.status === 'needs-review' && <AlertTriangle size={10} className="mr-1" />}
+            {questionProgress.status === 'practicing' && <RotateCcw size={10} className="mr-1" />}
+            {questionProgress.status === 'new' && <Flag size={10} className="mr-1" />}
+            {questionProgress.status.charAt(0).toUpperCase() + questionProgress.status.slice(1).replace('-', ' ')}
+          </div>
         </div>
         
         <div className="flex items-center space-x-2">
