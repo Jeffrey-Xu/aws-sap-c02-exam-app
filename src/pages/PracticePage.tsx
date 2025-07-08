@@ -93,12 +93,14 @@ const PracticePage: React.FC = () => {
   }, [questions.length, loading, loadQuestions]);
   
   useEffect(() => {
-    // Reset to first question when filters change
+    // Reset to first question when filters or recommended questions change
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
-  }, [filteredQuestions]);
+  }, [filteredQuestions, recommendedQuestions]);
 
-  const currentQuestion = filteredQuestions[currentQuestionIndex];
+  // Determine which questions to display: recommended questions take priority over filtered questions
+  const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
+  const currentQuestion = displayQuestions[currentQuestionIndex];
   
   const handleAnswer = (answer: string, timeSpent: number) => {
     if (!currentQuestion) return;
@@ -110,7 +112,7 @@ const PracticePage: React.FC = () => {
   };
   
   const handleNext = () => {
-    if (currentQuestionIndex < filteredQuestions.length - 1) {
+    if (currentQuestionIndex < displayQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setShowExplanation(false);
     }
@@ -128,6 +130,12 @@ const PracticePage: React.FC = () => {
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
     setShowRecommendations(false);
+  };
+  
+  const handleExitRecommendedSession = () => {
+    setRecommendedQuestions([]);
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
   };
   
   const handleStartFlashcards = () => {
@@ -222,8 +230,33 @@ const PracticePage: React.FC = () => {
         </div>
       </div>
       
+      {/* Recommended Session Indicator */}
+      {recommendedQuestions.length > 0 && (
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Zap className="w-5 h-5 text-purple-600 mr-2" />
+              <div>
+                <h3 className="font-semibold text-purple-900">Smart Recommendation Session</h3>
+                <p className="text-sm text-purple-700">
+                  Practicing {displayQuestions.length} recommended questions
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleExitRecommendedSession}
+              className="text-purple-600 border-purple-300 hover:bg-purple-100"
+            >
+              Exit Session
+            </Button>
+          </div>
+        </div>
+      )}
+      
       {/* Smart Recommendations */}
-      {!showRecommendations && (
+      {!showRecommendations && recommendedQuestions.length === 0 && (
         <div className="flex justify-center">
           <Button 
             variant="outline" 
@@ -256,7 +289,7 @@ const PracticePage: React.FC = () => {
       {filteredQuestions.length > 0 && (
         <div className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-sm text-gray-600">
-            Question {currentQuestionIndex + 1} of {filteredQuestions.length}
+            Question {currentQuestionIndex + 1} of {displayQuestions.length}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -272,7 +305,7 @@ const PracticePage: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={handleNext}
-              disabled={currentQuestionIndex === filteredQuestions.length - 1}
+              disabled={currentQuestionIndex === displayQuestions.length - 1}
             >
               Next
             </Button>
