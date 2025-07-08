@@ -15,7 +15,7 @@ const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ExamPage = lazy(() => import('./pages/ExamPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+const ServerAdminPage = lazy(() => import('./pages/ServerAdminPage'));
 
 // Loading component
 const LoadingSpinner: React.FC = () => (
@@ -69,7 +69,7 @@ function App() {
         {/* Admin route - must be first to prevent redirects */}
         <Route path="/admin" element={
           <Suspense fallback={<LoadingSpinner />}>
-            <AdminPage />
+            <ServerAdminPage />
           </Suspense>
         } />
         

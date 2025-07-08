@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Loader2, CheckCircle, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
+import { useServerAuthStore } from '../../stores/serverAuthStore';
 import { validateEmailFormat, validatePassword, getPasswordStrength } from '../../utils/emailValidation';
 import { ROUTES } from '../../constants';
 import Button from '../common/Button';
@@ -24,10 +24,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [emailSuggestion, setEmailSuggestion] = useState<string>('');
 
   const navigate = useNavigate();
-  const { signup, isLoading, error, clearError, getUserCount, canRegisterNewUser } = useAuthStore();
+  const { signup, isLoading, error, clearError } = useServerAuthStore();
 
-  const userCount = getUserCount();
-  const canRegister = canRegisterNewUser();
   const passwordStrength = getPasswordStrength(formData.password);
 
   const handleInputChange = (field: string, value: string) => {
@@ -91,11 +89,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!canRegister) {
-      setFieldErrors({ email: 'Maximum number of users reached. Please contact administrator.' });
-      return;
-    }
-
     if (!validateForm()) return;
 
     const result = await signup(formData);

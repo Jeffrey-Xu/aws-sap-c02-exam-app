@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Shield, BookOpen, Users, Award, RefreshCw } from 'lucide-react';
-import { useAuthStore } from '../stores/authStore';
+import { useServerAuthStore, checkServerSession } from '../stores/serverAuthStore';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
 import { resetAuthenticationSystem, migrateExistingUsers, checkAuthenticationStatus } from '../utils/resetAuth';
@@ -13,13 +13,12 @@ const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [showDebug, setShowDebug] = useState(false);
   
-  const { isAuthenticated, checkSession, clearError } = useAuthStore();
+  const { isAuthenticated, getCurrentUser, clearError } = useServerAuthStore();
 
   useEffect(() => {
-    checkSession();
-    // Automatically migrate existing users on page load
-    migrateExistingUsers();
-  }, [checkSession]);
+    // Check server session instead of localStorage session
+    checkServerSession();
+  }, []);
 
   // Redirect if already authenticated
   if (isAuthenticated) {

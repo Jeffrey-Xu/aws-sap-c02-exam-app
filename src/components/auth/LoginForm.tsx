@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { useServerAuthStore } from '../../stores/serverAuthStore';
 import { validateEmailFormat } from '../../utils/emailValidation';
 import Button from '../common/Button';
 
@@ -17,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup, onForgotPasswor
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, error, clearError } = useServerAuthStore();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
