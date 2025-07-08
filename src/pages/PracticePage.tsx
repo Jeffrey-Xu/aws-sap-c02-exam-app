@@ -42,7 +42,7 @@ const PracticePage: React.FC = () => {
   const [recommendedQuestions, setRecommendedQuestions] = useState<typeof questions>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Apply filters with progress data for bookmarks - MOVED UP
+  // Apply filters with progress data for bookmarks
   const filteredQuestions = React.useMemo(() => {
     return questions.filter(question => {
       // Category filter
@@ -87,6 +87,7 @@ const PracticePage: React.FC = () => {
   const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
   const currentQuestion = displayQuestions[currentQuestionIndex];
   
+  // Handler functions using useCallback
   const handleAnswer = useCallback((answer: string, timeSpent: number) => {
     if (!currentQuestion) return;
     
@@ -139,6 +140,7 @@ const PracticePage: React.FC = () => {
     setShowFlashcards(false);
   }, []);
   
+  // Effects
   useEffect(() => {
     if (questions.length === 0 && !loading) {
       loadQuestions();
@@ -196,62 +198,6 @@ const PracticePage: React.FC = () => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentQuestionIndex, displayQuestions.length, handleNext, handlePrevious]);
-
-  // Determine which questions to display: recommended questions take priority over filtered questions
-  const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
-  const currentQuestion = displayQuestions[currentQuestionIndex];
-  
-  const handleAnswer = useCallback((answer: string, timeSpent: number) => {
-    if (!currentQuestion) return;
-    
-    const isCorrect = answer === currentQuestion.correct_answer;
-    const questionDomain = categorizeQuestion(currentQuestion);
-    updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent, questionDomain);
-    setShowExplanation(true);
-  }, [currentQuestion, updateQuestionProgress]);
-  
-  const handleNext = useCallback(() => {
-    if (currentQuestionIndex < displayQuestions.length - 1) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentQuestionIndex(prev => prev + 1);
-        setShowExplanation(false);
-        setIsTransitioning(false);
-      }, 150);
-    }
-  }, [currentQuestionIndex, displayQuestions.length]);
-  
-  const handlePrevious = useCallback(() => {
-    if (currentQuestionIndex > 0) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentQuestionIndex(prev => prev - 1);
-        setShowExplanation(false);
-        setIsTransitioning(false);
-      }, 150);
-    }
-  }, [currentQuestionIndex]);
-  
-  const handleStartRecommendedSession = useCallback((questions: typeof filteredQuestions, sessionType: string) => {
-    setRecommendedQuestions(questions);
-    setCurrentQuestionIndex(0);
-    setShowExplanation(false);
-    setShowRecommendations(false);
-  }, []);
-  
-  const handleExitRecommendedSession = useCallback(() => {
-    setRecommendedQuestions([]);
-    setCurrentQuestionIndex(0);
-    setShowExplanation(false);
-  }, []);
-  
-  const handleStartFlashcards = useCallback(() => {
-    setShowFlashcards(true);
-  }, []);
-  
-  const handleExitFlashcards = useCallback(() => {
-    setShowFlashcards(false);
-  }, []);
   
   // Calculate question counts for filters
   const questionCounts = {
