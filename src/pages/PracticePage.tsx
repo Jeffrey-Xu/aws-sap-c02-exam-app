@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { ArrowLeft, BarChart3, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import QuestionCard from '../components/practice/QuestionCard';
@@ -54,6 +54,10 @@ const PracticePage: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Use ref to track previous filters for accurate change detection
+  const prevFiltersRef = useRef(filters);
+  const isFirstRender = useRef(true);
   
   // Apply filters with progress data for bookmarks
   const filteredQuestions = React.useMemo(() => {
@@ -211,10 +215,21 @@ const PracticePage: React.FC = () => {
     }
   }, [displayQuestions.length, currentQuestionIndex]);
   
+  // Only reset when filters actually change (not on initial mount)
   useEffect(() => {
-    // Reset to first question when filters change (but not when recommended questions change)
-    setCurrentQuestionIndex(0);
-    setShowExplanation(false);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      prevFiltersRef.current = filters;
+      return;
+    }
+    
+    // Check if filters have actually changed
+    const filtersChanged = JSON.stringify(prevFiltersRef.current) !== JSON.stringify(filters);
+    if (filtersChanged) {
+      setCurrentQuestionIndex(0);
+      setShowExplanation(false);
+      prevFiltersRef.current = filters;
+    }
   }, [filters]);
 
   // Add keyboard shortcuts for navigation
