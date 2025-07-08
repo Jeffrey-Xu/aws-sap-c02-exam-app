@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, CheckCircle, XCircle, BookOpen } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle, XCircle } from 'lucide-react';
 import type { Question } from '../../types';
 
 interface DetailedExplanationProps {
@@ -56,7 +56,7 @@ const DetailedExplanation: React.FC<DetailedExplanationProps> = ({ question, use
 
     return (
       <div className="space-y-4">
-        {Object.entries(question.detailed_reasoning.option_analyses).map(([key, analysis], index) => {
+        {Object.entries(question.detailed_reasoning.option_analyses).map(([key, analysis]) => {
           // Convert numeric keys to letters (0->A, 1->B, etc.) or use existing letter keys
           const letter = isNaN(parseInt(key)) ? key : String.fromCharCode(65 + parseInt(key));
           const isUserAnswer = userAnswer === letter;

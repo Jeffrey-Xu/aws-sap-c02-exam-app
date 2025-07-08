@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, RefreshCw, Download, Upload } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Download } from 'lucide-react';
 import Button from './Button';
 import Card from './Card';
 import ConfirmDialog from './ConfirmDialog';
