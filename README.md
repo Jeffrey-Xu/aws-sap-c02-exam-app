@@ -205,3 +205,4 @@ Good luck with your AWS SAP-C02 exam preparation! 🚀
 ---
 
 **Disclaimer**: This application is not affiliated with Amazon Web Services (AWS). It is an independent study tool created to help with exam preparation.
+# Trigger deployment after adding JWT_SECRET environment variable
