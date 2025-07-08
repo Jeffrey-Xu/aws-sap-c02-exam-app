@@ -1,4 +1,4 @@
-const { Redis } = require('@upstash/redis');
+import { Redis } from '@upstash/redis';
 
 export default async function handler(req, res) {
   // Set CORS headers

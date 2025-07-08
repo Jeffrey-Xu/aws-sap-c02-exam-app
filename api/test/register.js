@@ -1,5 +1,5 @@
-const { Redis } = require('@upstash/redis');
-const bcrypt = require('bcryptjs');
+import { Redis } from '@upstash/redis';
+import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
   // Set CORS headers
