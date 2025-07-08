@@ -336,7 +336,7 @@ export const useProgressStore = create<ProgressStore>()(
           const masteredCount = Object.values(state.questionProgress)
             .filter(progress => progress.status === 'mastered').length;
           
-          // Recalculate category progress
+          // Initialize category progress for all domains
           const categoryProgress: Record<ExamDomain, CategoryProgress> = {} as Record<ExamDomain, CategoryProgress>;
           
           // Group questions by domain
@@ -348,8 +348,11 @@ export const useProgressStore = create<ProgressStore>()(
             questionsByDomain[progress.domain].push(progress);
           });
           
-          // Calculate progress for each domain
-          Object.entries(questionsByDomain).forEach(([domain, domainQuestions]) => {
+          // Ensure all domains are represented, even if no questions attempted
+          const allDomains = ['organizational-complexity', 'new-solutions', 'migration-planning', 'cost-control', 'continuous-improvement'] as ExamDomain[];
+          
+          allDomains.forEach(domain => {
+            const domainQuestions = questionsByDomain[domain] || [];
             const masteredInDomain = domainQuestions.filter(progress => progress.status === 'mastered').length;
             const attemptedInDomain = domainQuestions.filter(progress => progress.attempts > 0).length;
             const totalTimeInDomain = domainQuestions.reduce((sum, progress) => sum + progress.timeSpent, 0);
@@ -368,13 +371,13 @@ export const useProgressStore = create<ProgressStore>()(
             }
 
             // Preserve existing totalQuestions if it exists and is larger than attempted questions
-            const existingProgress = state.categoryProgress[domain as ExamDomain];
+            const existingProgress = state.categoryProgress[domain];
             const totalQuestions = (existingProgress && existingProgress.totalQuestions > domainQuestions.length) 
               ? existingProgress.totalQuestions 
-              : domainQuestions.length;
+              : Math.max(domainQuestions.length, 1); // Ensure minimum of 1 to avoid division by zero
 
-            categoryProgress[domain as ExamDomain] = {
-              domain: domain as ExamDomain,
+            categoryProgress[domain] = {
+              domain: domain,
               totalQuestions: totalQuestions,
               attemptedQuestions: attemptedInDomain,
               masteredQuestions: masteredInDomain,

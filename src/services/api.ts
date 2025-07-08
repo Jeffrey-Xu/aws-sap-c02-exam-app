@@ -3,11 +3,41 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://aws-sap-c02-exam-app.vercel.app/api'
   : '/api';
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   code?: string;
+}
+
+interface UserData {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  examDate?: string;
+  createdAt: string;
+  emailVerified: boolean;
+}
+
+interface ProgressData {
+  totalQuestions: number;
+  masteredQuestions: number;
+  totalStudyTime: number;
+  studyStreak: number;
+  examAttempts: Array<{
+    id: string;
+    score: { percentage: number; correct: number; total: number };
+    completedAt: string;
+  }>;
+  questionProgress: Record<string, {
+    questionId: number;
+    attempts: number;
+    correctAttempts: number;
+    status: string;
+    timeSpent: number;
+    domain: string;
+  }>;
 }
 
 class ApiService {
@@ -41,9 +71,9 @@ class ApiService {
 
       return {
         success: true,
-        data: data
+        data: data as T
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: 'Network error or invalid response',
@@ -59,14 +89,14 @@ class ApiService {
     email: string;
     password: string;
     confirmPassword: string;
-  }): Promise<ApiResponse<{ user: any; token: string }>> {
+  }): Promise<ApiResponse<{ user: UserData; token: string }>> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(userData)
     });
 
-    const result = await this.handleResponse<{ user: any; token: string }>(response);
+    const result = await this.handleResponse<{ user: UserData; token: string }>(response);
     
     // Store token if registration successful
     if (result.success && result.data?.token) {

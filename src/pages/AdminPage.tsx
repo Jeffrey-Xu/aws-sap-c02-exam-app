@@ -93,8 +93,8 @@ const AdminPage: React.FC = () => {
               console.log(`  ${key}:`, value);
               try {
                 const parsed = JSON.parse(value || '[]');
-                console.log(`    Parsed users (${parsed.length}):`, parsed.map((u: any) => ({ id: u.id, email: u.email, createdAt: u.createdAt })));
-              } catch (e) {
+                console.log(`    Parsed users (${parsed.length}):`, parsed.map((u: { id: string; email: string; createdAt: string }) => ({ id: u.id, email: u.email, createdAt: u.createdAt })));
+              } catch {
                 console.log('    Failed to parse users data');
               }
             } else {
@@ -128,9 +128,17 @@ const AdminPage: React.FC = () => {
       
       if (usersData && usersData !== 'null' && usersData !== '[]') {
         const users = JSON.parse(usersData);
-        console.log(`Found ${users.length} users in storage:`, users.map((u: any) => ({ email: u.email, id: u.id, createdAt: u.createdAt })));
+        console.log(`Found ${users.length} users in storage:`, users.map((u: { email: string; id: string; createdAt: string }) => ({ email: u.email, id: u.id, createdAt: u.createdAt })));
         
-        users.forEach((user: any) => {
+        interface ProgressData {
+          totalQuestions?: number;
+          masteredQuestions?: number;
+          totalStudyTime?: number;
+          examAttempts?: Array<{ score?: { percentage: number } }>;
+          studyStreak?: number;
+        }
+        
+        users.forEach((user: { id: string; email: string }) => {
           try {
             // Try the specific progress key patterns found in localStorage
             const possibleProgressKeys = [
@@ -140,33 +148,33 @@ const AdminPage: React.FC = () => {
               `user_progress_user_${user.id}`
             ];
             
-            let progressData = {};
+            let progressData: ProgressData = {};
             
             for (const key of possibleProgressKeys) {
               const data = localStorage.getItem(key);
               if (data && data !== 'null') {
                 try {
-                  progressData = JSON.parse(data);
+                  progressData = JSON.parse(data) as ProgressData;
                   break;
-                } catch (e) {
+                } catch {
                   console.log(`Failed to parse data for key: ${key}`);
                 }
               }
             }
             
             // Calculate metrics from progress data
-            const totalQuestions = (progressData as any).totalQuestions || 0;
-            const masteredQuestions = (progressData as any).masteredQuestions || 0;
-            const studyTime = (progressData as any).totalStudyTime || 0;
-            const examAttempts = (progressData as any).examAttempts?.length || 0;
-            const studyStreak = (progressData as any).studyStreak || 0;
+            const totalQuestions = progressData.totalQuestions || 0;
+            const masteredQuestions = progressData.masteredQuestions || 0;
+            const studyTime = progressData.totalStudyTime || 0;
+            const examAttempts = progressData.examAttempts?.length || 0;
+            const studyStreak = progressData.studyStreak || 0;
             
             // Calculate average score from exam attempts
             let averageScore = 0;
-            if ((progressData as any).examAttempts && (progressData as any).examAttempts.length > 0) {
-              const totalScore = (progressData as any).examAttempts.reduce((sum: number, attempt: any) => 
+            if (progressData.examAttempts && progressData.examAttempts.length > 0) {
+              const totalScore = progressData.examAttempts.reduce((sum: number, attempt) => 
                 sum + (attempt.score?.percentage || 0), 0);
-              averageScore = Math.round(totalScore / (progressData as any).examAttempts.length);
+              averageScore = Math.round(totalScore / progressData.examAttempts.length);
             }
             
             // Calculate readiness score

@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, BarChart3, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle, Clock, TrendingUp } from 'lucide-react';
+import { BookOpen, Trophy, Target, Calendar, Flame, CheckCircle, AlertTriangle, RotateCcw, Flag, HelpCircle, Clock, TrendingUp } from 'lucide-react';
 import Card from '../components/common/Card';
 import ProgressBar from '../components/common/ProgressBar';
 import ExamCountdown from '../components/common/ExamCountdown';
@@ -10,11 +10,9 @@ import { useProgressStore } from '../stores/progressStore';
 import { useServerAuthStore } from '../stores/serverAuthStore';
 import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES, DOMAIN_INFO } from '../constants';
-import { calculateReadinessScore, safePercentage, safeNumber, formatTime, categorizeQuestion } from '../utils/questionUtils';
-import type { QuestionStatus } from '../types';
+import { calculateReadinessScore, safePercentage, formatTime, categorizeQuestion } from '../utils/questionUtils';
 
 const HomePage: React.FC = () => {
-  const location = useLocation();
   const { questions, loading, loadQuestions } = useQuestionStore();
   const { user } = useServerAuthStore();
   const { 
@@ -25,12 +23,8 @@ const HomePage: React.FC = () => {
     examAttempts,
     calculateProgress,
     questionProgress,
-    totalStudyTime,
-    loadUserProgress
+    totalStudyTime
   } = useProgressStore();
-  
-  // Use data refresh hook for tab switching
-  const { refreshAllData } = useDataRefresh();
   
   // Calculate status statistics
   const statusStats = React.useMemo(() => {
@@ -174,19 +168,30 @@ const HomePage: React.FC = () => {
           <div className="text-2xl font-bold text-gray-900">{formatTime(totalStudyTime)}</div>
           <div className="text-sm text-gray-600 mb-2">Total Study Time</div>
           <div className="text-xs text-gray-500">
-            {totalStudyTime > 0 ? `${Math.round(totalStudyTime / 3600)} hours of focused study` : 'Start studying to track time'}
+            {totalStudyTime > 0 
+              ? `${Math.floor(totalStudyTime / 3600)}h ${Math.floor((totalStudyTime % 3600) / 60)}m of focused study` 
+              : 'Start studying to track time'
+            }
           </div>
         </Card>
         
         <Card className="p-6 text-center">
           <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-3" />
           <div className="text-2xl font-bold text-gray-900">
-            {Object.values(questionProgress).length > 0 ? 
-              Math.round(Object.values(questionProgress).reduce((sum, p) => sum + (p.correctAttempts / Math.max(p.attempts, 1)), 0) / Object.values(questionProgress).length * 100) : 0}%
+            {(() => {
+              const attemptedQuestions = Object.values(questionProgress).filter(p => p.attempts > 0);
+              if (attemptedQuestions.length === 0) return 0;
+              
+              const totalAccuracy = attemptedQuestions.reduce((sum, p) => sum + (p.correctAttempts / p.attempts), 0);
+              return Math.round((totalAccuracy / attemptedQuestions.length) * 100);
+            })()}%
           </div>
           <div className="text-sm text-gray-600 mb-2">Overall Accuracy</div>
           <div className="text-xs text-gray-500">
-            Average success rate across all attempts
+            {Object.values(questionProgress).filter(p => p.attempts > 0).length > 0 
+              ? `Based on ${Object.values(questionProgress).filter(p => p.attempts > 0).length} attempted questions`
+              : 'No questions attempted yet'
+            }
           </div>
         </Card>
         

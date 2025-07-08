@@ -41,7 +41,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [email]);
+  }, [email, handleVerification]);
 
   // Resend cooldown timer
   useEffect(() => {
