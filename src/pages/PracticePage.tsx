@@ -35,11 +35,24 @@ const PracticePage: React.FC = () => {
   // Use data refresh hook for tab switching
   const { refreshAllData } = useDataRefresh();
   
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showExplanation, setShowExplanation] = useState(false);
+  // State with persistence for navigation continuity
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
+    const saved = sessionStorage.getItem('practice-current-question-index');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [showExplanation, setShowExplanation] = useState(() => {
+    const saved = sessionStorage.getItem('practice-show-explanation');
+    return saved === 'true';
+  });
   const [showFlashcards, setShowFlashcards] = useState(false);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [recommendedQuestions, setRecommendedQuestions] = useState<typeof questions>([]);
+  const [showRecommendations, setShowRecommendations] = useState(() => {
+    const saved = sessionStorage.getItem('practice-show-recommendations');
+    return saved === 'true';
+  });
+  const [recommendedQuestions, setRecommendedQuestions] = useState<typeof questions>(() => {
+    const saved = sessionStorage.getItem('practice-recommended-questions');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Apply filters with progress data for bookmarks
@@ -124,12 +137,19 @@ const PracticePage: React.FC = () => {
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
     setShowRecommendations(false);
+    // Clear previous session state when starting a new recommended session
+    sessionStorage.setItem('practice-current-question-index', '0');
+    sessionStorage.setItem('practice-show-explanation', 'false');
   }, []);
   
   const handleExitRecommendedSession = useCallback(() => {
     setRecommendedQuestions([]);
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
+    // Clear recommended session state
+    sessionStorage.removeItem('practice-recommended-questions');
+    sessionStorage.setItem('practice-current-question-index', '0');
+    sessionStorage.setItem('practice-show-explanation', 'false');
   }, []);
   
   const handleStartFlashcards = useCallback(() => {
@@ -138,6 +158,20 @@ const PracticePage: React.FC = () => {
   
   const handleExitFlashcards = useCallback(() => {
     setShowFlashcards(false);
+  }, []);
+
+  const handleClearSession = useCallback(() => {
+    // Clear all session storage
+    sessionStorage.removeItem('practice-current-question-index');
+    sessionStorage.removeItem('practice-show-explanation');
+    sessionStorage.removeItem('practice-show-recommendations');
+    sessionStorage.removeItem('practice-recommended-questions');
+    
+    // Reset state
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+    setShowRecommendations(false);
+    setRecommendedQuestions([]);
   }, []);
   
   // Effects
@@ -153,11 +187,35 @@ const PracticePage: React.FC = () => {
     }
   }, [questions.length, loading, loadQuestions]);
   
+  // Persist state changes to sessionStorage
   useEffect(() => {
-    // Reset to first question when filters or recommended questions change
+    sessionStorage.setItem('practice-current-question-index', currentQuestionIndex.toString());
+  }, [currentQuestionIndex]);
+  
+  useEffect(() => {
+    sessionStorage.setItem('practice-show-explanation', showExplanation.toString());
+  }, [showExplanation]);
+  
+  useEffect(() => {
+    sessionStorage.setItem('practice-show-recommendations', showRecommendations.toString());
+  }, [showRecommendations]);
+  
+  useEffect(() => {
+    sessionStorage.setItem('practice-recommended-questions', JSON.stringify(recommendedQuestions));
+  }, [recommendedQuestions]);
+  
+  // Validate and adjust current question index when questions change
+  useEffect(() => {
+    if (displayQuestions.length > 0 && currentQuestionIndex >= displayQuestions.length) {
+      setCurrentQuestionIndex(0);
+    }
+  }, [displayQuestions.length, currentQuestionIndex]);
+  
+  useEffect(() => {
+    // Reset to first question when filters change (but not when recommended questions change)
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
-  }, [filters, recommendedQuestions]);
+  }, [filters]);
 
   // Add keyboard shortcuts for navigation
   useEffect(() => {
@@ -198,6 +256,18 @@ const PracticePage: React.FC = () => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentQuestionIndex, displayQuestions.length, handleNext, handlePrevious]);
+
+  // Cleanup effect - clear session storage when explicitly requested
+  useEffect(() => {
+    return () => {
+      // Optional: Clear session storage on component unmount if needed
+      // Uncomment the lines below if you want to clear state when leaving the page entirely
+      // sessionStorage.removeItem('practice-current-question-index');
+      // sessionStorage.removeItem('practice-show-explanation');
+      // sessionStorage.removeItem('practice-show-recommendations');
+      // sessionStorage.removeItem('practice-recommended-questions');
+    };
+  }, []);
   
   // Calculate question counts for filters
   const questionCounts = {
@@ -281,6 +351,16 @@ const PracticePage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">Practice Mode</h1>
             <p className="text-gray-600">Study by domain with instant feedback</p>
           </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleClearSession}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            Clear Session
+          </Button>
         </div>
       </div>
       
