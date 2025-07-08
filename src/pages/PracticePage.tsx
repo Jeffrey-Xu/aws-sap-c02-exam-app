@@ -41,6 +41,7 @@ const PracticePage: React.FC = () => {
   
   useEffect(() => {
     if (questions.length === 0 && !loading) {
+      console.log('🔄 Loading questions...');
       loadQuestions();
     }
     
@@ -50,6 +51,16 @@ const PracticePage: React.FC = () => {
       setShowFlashcards(true);
     }
   }, [questions.length, loading, loadQuestions]);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('📊 PracticePage state:', {
+      questionsCount: questions.length,
+      loading,
+      filteredCount: filteredQuestions.length,
+      currentIndex: currentQuestionIndex
+    });
+  }, [questions.length, loading, filteredQuestions.length, currentQuestionIndex]);
   
   useEffect(() => {
     // Reset to first question when filters change
@@ -161,6 +172,7 @@ const PracticePage: React.FC = () => {
   };
   
   if (loading) {
+    console.log('⏳ PracticePage: Showing loading state');
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aws-orange"></div>
@@ -169,6 +181,7 @@ const PracticePage: React.FC = () => {
   }
   
   if (questions.length === 0) {
+    console.log('❌ PracticePage: No questions available');
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-4">

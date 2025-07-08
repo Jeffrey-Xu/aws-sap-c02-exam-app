@@ -39,7 +39,20 @@ export function categorizeQuestion(question: Question): ExamDomain {
 
 function categorizeDesignSolutionQuestion(question: Question): ExamDomain {
   const questionText = question.question.toLowerCase();
-  const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
+  
+  // Safely extract options text
+  let optionsText = '';
+  if (question.options && Array.isArray(question.options)) {
+    optionsText = question.options
+      .map(opt => {
+        if (typeof opt === 'string') return opt;
+        if (opt && typeof opt === 'object' && opt.text) return opt.text;
+        return '';
+      })
+      .join(' ')
+      .toLowerCase();
+  }
+  
   const explanationText = (question.explanation || '').toLowerCase();
   const fullText = `${questionText} ${optionsText} ${explanationText}`;
   
@@ -69,7 +82,20 @@ function categorizeDesignSolutionQuestion(question: Question): ExamDomain {
 
 function categorizeByContent(question: Question): ExamDomain {
   const questionText = question.question.toLowerCase();
-  const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
+  
+  // Safely extract options text
+  let optionsText = '';
+  if (question.options && Array.isArray(question.options)) {
+    optionsText = question.options
+      .map(opt => {
+        if (typeof opt === 'string') return opt;
+        if (opt && typeof opt === 'object' && opt.text) return opt.text;
+        return '';
+      })
+      .join(' ')
+      .toLowerCase();
+  }
+  
   const explanationText = (question.explanation || '').toLowerCase();
   const fullText = `${questionText} ${optionsText} ${explanationText}`;
   
