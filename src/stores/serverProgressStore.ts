@@ -200,9 +200,9 @@ export const useServerProgressStore = create<ServerProgressStore>((set, get) => 
     set({ error: null });
   },
 
-  // Enable auto-save
+  // Enable auto-save - only in browser
   enableAutoSave: () => {
-    if (autoSaveInterval) return;
+    if (typeof window === 'undefined' || autoSaveInterval) return;
     
     autoSaveInterval = setInterval(() => {
       const state = get();
@@ -221,11 +221,11 @@ export const useServerProgressStore = create<ServerProgressStore>((set, get) => 
   }
 }));
 
-// Initialize auto-save when store is created
-useServerProgressStore.getState().enableAutoSave();
-
-// Cleanup on page unload
+// Initialize auto-save when store is created - only in browser
 if (typeof window !== 'undefined') {
+  useServerProgressStore.getState().enableAutoSave();
+
+  // Cleanup on page unload
   window.addEventListener('beforeunload', () => {
     const state = useServerProgressStore.getState();
     state.disableAutoSave();

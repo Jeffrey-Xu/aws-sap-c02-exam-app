@@ -177,14 +177,16 @@ export const useServerAuthStore = create<ServerAuthStore>()(
         // Only persist user and authentication status
         // Token is stored separately in localStorage by apiService
         user: state.user,
-        isAuthenticated: state.isAuthenticated && apiService.isAuthenticated()
+        isAuthenticated: state.isAuthenticated && (typeof window !== 'undefined' && apiService.isAuthenticated())
       })
     }
   )
 );
 
-// Session check function
+// Session check function - only run in browser
 export const checkServerSession = async () => {
+  if (typeof window === 'undefined') return; // Skip on server-side rendering
+  
   const store = useServerAuthStore.getState();
   
   if (apiService.isAuthenticated() && !store.user) {
