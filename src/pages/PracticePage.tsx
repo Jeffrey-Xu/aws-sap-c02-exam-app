@@ -149,7 +149,7 @@ const PracticePage: React.FC = () => {
   // Calculate question counts for filters
   const questionCounts = {
     total: questions.length,
-    filtered: filteredQuestions.length,
+    filtered: displayQuestions.length,
     byCategory: Object.keys(questions.reduce((acc, q) => {
       const category = q.category || 'new-solutions';
       acc[category] = (acc[category] || 0) + 1;
@@ -160,7 +160,7 @@ const PracticePage: React.FC = () => {
       ).length;
       return acc;
     }, {} as Record<ExamDomain, number>),
-    byStatus: questions.reduce((acc, question) => {
+    byStatus: displayQuestions.reduce((acc, question) => {
       const progress = questionProgress[question.id];
       const status = progress?.status || 'new'; // Default to 'new' if no progress
       acc[status] = (acc[status] || 0) + 1;
