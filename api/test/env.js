@@ -14,18 +14,25 @@ export default async function handler(req, res) {
 
   try {
     const envCheck = {
+      // Check both variable name formats
+      hasKvUrl: !!process.env.KV_REST_API_URL,
+      hasKvToken: !!process.env.KV_REST_API_TOKEN,
       hasUpstashUrl: !!process.env.UPSTASH_REDIS_REST_URL,
       hasUpstashToken: !!process.env.UPSTASH_REDIS_REST_TOKEN,
       hasJwtSecret: !!process.env.JWT_SECRET,
-      upstashUrlPrefix: process.env.UPSTASH_REDIS_REST_URL ? 
-        process.env.UPSTASH_REDIS_REST_URL.substring(0, 20) + '...' : 'MISSING',
+      
+      // Show which URL is being used
+      activeUrl: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || 'MISSING',
+      urlPrefix: (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL) ? 
+        (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL).substring(0, 30) + '...' : 'MISSING',
+      
       nodeEnv: process.env.NODE_ENV || 'undefined'
     };
 
     res.status(200).json({
       success: true,
       environment: envCheck,
-      message: 'Environment variables check'
+      message: 'Environment variables check - updated for KV variable names'
     });
 
   } catch (error) {
