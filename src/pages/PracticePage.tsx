@@ -145,16 +145,16 @@ const PracticePage: React.FC = () => {
   const displayQuestions = recommendedQuestions.length > 0 ? recommendedQuestions : filteredQuestions;
   const currentQuestion = displayQuestions[currentQuestionIndex];
   
-  const handleAnswer = (answer: string, timeSpent: number) => {
+  const handleAnswer = useCallback((answer: string, timeSpent: number) => {
     if (!currentQuestion) return;
     
     const isCorrect = answer === currentQuestion.correct_answer;
     const questionDomain = categorizeQuestion(currentQuestion);
     updateQuestionProgress(currentQuestion.id, isCorrect, timeSpent, questionDomain);
     setShowExplanation(true);
-  };
+  }, [currentQuestion, updateQuestionProgress]);
   
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentQuestionIndex < displayQuestions.length - 1) {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -163,9 +163,9 @@ const PracticePage: React.FC = () => {
         setIsTransitioning(false);
       }, 150);
     }
-  };
+  }, [currentQuestionIndex, displayQuestions.length]);
   
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -174,28 +174,28 @@ const PracticePage: React.FC = () => {
         setIsTransitioning(false);
       }, 150);
     }
-  };
+  }, [currentQuestionIndex]);
   
-  const handleStartRecommendedSession = (questions: typeof filteredQuestions, sessionType: string) => {
+  const handleStartRecommendedSession = useCallback((questions: typeof filteredQuestions, sessionType: string) => {
     setRecommendedQuestions(questions);
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
     setShowRecommendations(false);
-  };
+  }, []);
   
-  const handleExitRecommendedSession = () => {
+  const handleExitRecommendedSession = useCallback(() => {
     setRecommendedQuestions([]);
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
-  };
+  }, []);
   
-  const handleStartFlashcards = () => {
+  const handleStartFlashcards = useCallback(() => {
     setShowFlashcards(true);
-  };
+  }, []);
   
-  const handleExitFlashcards = () => {
+  const handleExitFlashcards = useCallback(() => {
     setShowFlashcards(false);
-  };
+  }, []);
   
   // Calculate question counts for filters
   const questionCounts = {
