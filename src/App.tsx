@@ -16,6 +16,7 @@ const ExamPage = lazy(() => import('./pages/ExamPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ServerAdminPage = lazy(() => import('./pages/ServerAdminPage'));
+const DebugAuthPage = lazy(() => import('./pages/DebugAuthPage'));
 
 // Loading component
 const LoadingSpinner: React.FC = () => (
@@ -70,6 +71,13 @@ function App() {
         <Route path="/admin" element={
           <Suspense fallback={<LoadingSpinner />}>
             <ServerAdminPage />
+          </Suspense>
+        } />
+        
+        {/* Debug Auth route - for troubleshooting */}
+        <Route path="/debug-auth" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <DebugAuthPage />
           </Suspense>
         } />
         

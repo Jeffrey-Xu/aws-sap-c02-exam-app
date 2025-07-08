@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiService } from '../services/api';
+import { clearAllAuthData } from '../utils/authCleanup';
 import type { User, AuthState, UserCredentials, SignupData, AuthResult } from '../types/auth';
 
 interface ServerAuthStore extends AuthState {
@@ -158,7 +159,10 @@ export const useServerAuthStore = create<ServerAuthStore>()(
 
       // Logout action
       logout: () => {
-        apiService.logout();
+        // Use comprehensive cleanup
+        clearAllAuthData();
+        
+        // Also clear the store state (though page will reload)
         set({
           user: null,
           isAuthenticated: false,
