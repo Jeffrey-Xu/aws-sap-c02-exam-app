@@ -63,9 +63,14 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (questions.length > 0) {
       const questionsByCategory = Object.keys(DOMAIN_INFO).reduce((acc, domain) => {
-        acc[domain as keyof typeof DOMAIN_INFO] = questions.filter(q => categorizeQuestion(q) === domain).length;
+        const count = questions.filter(q => categorizeQuestion(q) === domain).length;
+        acc[domain as keyof typeof DOMAIN_INFO] = count;
         return acc;
       }, {} as Record<keyof typeof DOMAIN_INFO, number>);
+      
+      // Debug: Log the actual counts
+      console.log('Domain question counts:', questionsByCategory);
+      console.log('Total questions:', questions.length);
       
       calculateProgress(questions.length, questionsByCategory);
     }
