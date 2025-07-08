@@ -1,4 +1,4 @@
-// Ultra-simple registration endpoint - minimal dependencies
+// Ultra-simple registration endpoint - fixed Redis API format
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,6 +14,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Simple registration started');
+    
     const { firstName, lastName, email, password } = req.body;
 
     // Basic validation
@@ -24,16 +26,21 @@ export default async function handler(req, res) {
       });
     }
 
-    // Simple Redis connection using fetch (no external dependencies)
+    console.log('Validation passed for:', email);
+
+    // Get Redis credentials
     const redisUrl = process.env.KV_REST_API_URL;
     const redisToken = process.env.KV_REST_API_TOKEN;
 
     if (!redisUrl || !redisToken) {
+      console.error('Redis credentials missing');
       return res.status(500).json({ 
         error: 'Database configuration missing',
         code: 'CONFIG_ERROR'
       });
     }
+
+    console.log('Redis credentials found');
 
     // Create simple user object
     const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -46,19 +53,31 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString(),
     };
 
-    // Save to Redis using REST API
-    const saveResponse = await fetch(`${redisUrl}/set/user:${userId}`, {
+    console.log('User object created:', userId);
+
+    // Save to Redis using correct REST API format
+    const redisKey = `user:${userId}`;
+    const saveResponse = await fetch(`${redisUrl}/set/${redisKey}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${redisToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(user)
+      body: JSON.stringify({
+        value: JSON.stringify(user)
+      })
     });
 
+    console.log('Redis save response status:', saveResponse.status);
+
     if (!saveResponse.ok) {
-      throw new Error(`Redis save failed: ${saveResponse.status}`);
+      const errorText = await saveResponse.text();
+      console.error('Redis save failed:', saveResponse.status, errorText);
+      throw new Error(`Redis save failed: ${saveResponse.status} - ${errorText}`);
     }
+
+    const saveResult = await saveResponse.json();
+    console.log('Redis save successful:', saveResult);
 
     // Return success (without password)
     const { password: _, ...safeUser } = user;
@@ -66,7 +85,8 @@ export default async function handler(req, res) {
     res.status(201).json({
       success: true,
       user: safeUser,
-      message: 'User created successfully (simple version)'
+      message: 'User created successfully (simple version)',
+      redisResult: saveResult
     });
 
   } catch (error) {
