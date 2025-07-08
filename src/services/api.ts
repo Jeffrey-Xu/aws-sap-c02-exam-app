@@ -105,6 +105,16 @@ class ApiService {
     return this.handleResponse<{ user: any }>(response);
   }
 
+  async updateProfile(updates: any): Promise<ApiResponse<{ user: any }>> {
+    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(updates)
+    });
+
+    return this.handleResponse<{ user: any }>(response);
+  }
+
   logout(): void {
     // Remove all authentication-related data
     localStorage.removeItem('auth_token');

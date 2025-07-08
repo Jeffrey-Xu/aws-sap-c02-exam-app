@@ -13,7 +13,7 @@ interface AuthStore extends AuthState {
   login: (credentials: UserCredentials) => Promise<AuthResult>;
   signup: (data: SignupData) => Promise<AuthResult>;
   logout: () => void;
-  updateProfile: (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture'>>) => Promise<boolean>;
+  updateProfile: (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture' | 'examDate'>>) => Promise<boolean>;
   deleteAccount: () => Promise<boolean>;
   checkSession: () => void;
   clearError: () => void;
@@ -249,7 +249,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      updateProfile: async (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture'>>): Promise<boolean> => {
+      updateProfile: async (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture' | 'examDate'>>): Promise<boolean> => {
         const { user } = get();
         if (!user) return false;
 

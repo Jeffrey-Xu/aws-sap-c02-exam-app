@@ -11,6 +11,7 @@ interface ServerAuthStore extends AuthState {
   logout: () => void;
   getCurrentUser: () => Promise<void>;
   clearError: () => void;
+  updateProfile: (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture' | 'examDate'>>) => Promise<boolean>;
   
   // Server-side specific
   isServerMode: boolean;
@@ -154,6 +155,32 @@ export const useServerAuthStore = create<ServerAuthStore>()(
         } catch (error) {
           // Network error - keep current state but stop loading
           set({ isLoading: false });
+        }
+      },
+
+      // Update profile
+      updateProfile: async (updates: Partial<Pick<User, 'firstName' | 'lastName' | 'profilePicture' | 'examDate'>>): Promise<boolean> => {
+        const { user } = get();
+        if (!user) return false;
+
+        try {
+          const result = await apiService.updateProfile(updates);
+
+          if (result.success && result.data) {
+            const updatedUser: User = {
+              ...user,
+              ...updates,
+              examDate: updates.examDate || user.examDate
+            };
+
+            set({ user: updatedUser });
+            return true;
+          }
+
+          return false;
+        } catch (error) {
+          console.error('Profile update failed:', error);
+          return false;
         }
       },
 

@@ -86,7 +86,8 @@ const PracticePage: React.FC = () => {
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
         const questionText = question.question.toLowerCase();
-        const optionsText = question.options.map(opt => opt.text.toLowerCase()).join(' ');
+        const optionsText = question.options ? 
+          question.options.map(opt => (typeof opt === 'string' ? opt : opt.text || '')).join(' ').toLowerCase() : '';
         
         if (!questionText.includes(searchTerm) && !optionsText.includes(searchTerm)) {
           return false;
