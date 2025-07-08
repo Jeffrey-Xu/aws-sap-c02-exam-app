@@ -367,9 +367,15 @@ export const useProgressStore = create<ProgressStore>()(
               }
             }
 
+            // Preserve existing totalQuestions if it exists and is larger than attempted questions
+            const existingProgress = state.categoryProgress[domain as ExamDomain];
+            const totalQuestions = (existingProgress && existingProgress.totalQuestions > domainQuestions.length) 
+              ? existingProgress.totalQuestions 
+              : domainQuestions.length;
+
             categoryProgress[domain as ExamDomain] = {
               domain: domain as ExamDomain,
-              totalQuestions: domainQuestions.length,
+              totalQuestions: totalQuestions,
               attemptedQuestions: attemptedInDomain,
               masteredQuestions: masteredInDomain,
               averageScore: Math.round(averageScore * 100) / 100,
