@@ -10,7 +10,7 @@ import { useProgressStore } from '../stores/progressStore';
 import { useServerAuthStore } from '../stores/serverAuthStore';
 import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES, DOMAIN_INFO } from '../constants';
-import { calculateReadinessScore, safePercentage, safeNumber, formatTime } from '../utils/questionUtils';
+import { calculateReadinessScore, safePercentage, safeNumber, formatTime, categorizeQuestion } from '../utils/questionUtils';
 import type { QuestionStatus } from '../types';
 
 const HomePage: React.FC = () => {
@@ -63,7 +63,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (questions.length > 0) {
       const questionsByCategory = Object.keys(DOMAIN_INFO).reduce((acc, domain) => {
-        acc[domain as keyof typeof DOMAIN_INFO] = questions.filter(q => q.category === domain).length;
+        acc[domain as keyof typeof DOMAIN_INFO] = questions.filter(q => categorizeQuestion(q) === domain).length;
         return acc;
       }, {} as Record<keyof typeof DOMAIN_INFO, number>);
       
