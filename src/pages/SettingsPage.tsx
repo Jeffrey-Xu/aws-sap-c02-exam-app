@@ -5,7 +5,7 @@ import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { useProgressStore } from '../stores/progressStore';
-import { useAuthStore } from '../stores/authStore';
+import { useServerAuthStore } from '../stores/serverAuthStore';
 import { useExamStore } from '../stores/examStore';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
 import { ROUTES } from '../constants';
@@ -26,7 +26,7 @@ const SettingsPage: React.FC = () => {
     updateProfile,
     deleteAccount,
     logout
-  } = useAuthStore();
+  } = useServerAuthStore();
   
   const { 
     currentSession, 

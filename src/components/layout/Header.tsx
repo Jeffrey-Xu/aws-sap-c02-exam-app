@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, Clock, BarChart3, Settings, Home, Cloud, Users, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { useServerAuthStore } from '../../stores/serverAuthStore';
 import { ROUTES } from '../../constants';
 
 const Header: React.FC = () => {
@@ -10,7 +10,7 @@ const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useServerAuthStore();
   
   const navItems = [
     { path: ROUTES.HOME, label: 'Dashboard', icon: Home },

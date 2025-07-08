@@ -106,7 +106,19 @@ class ApiService {
   }
 
   logout(): void {
+    // Remove all authentication-related data
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('admin_authenticated');
+    
+    // Clear any user-specific progress data (optional - you might want to keep this)
+    // Object.keys(localStorage).forEach(key => {
+    //   if (key.startsWith('progress-store-')) {
+    //     localStorage.removeItem(key);
+    //   }
+    // });
+    
+    // Clear session storage as well
+    sessionStorage.clear();
   }
 
   // Progress endpoints
