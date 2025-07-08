@@ -9,7 +9,6 @@ import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { useQuestionStore } from '../stores/questionStore';
 import { categorizeQuestion } from '../utils/questionUtils';
-import { categorizeQuestion } from '../utils/questionUtils';
 import { useProgressStore } from '../stores/progressStore';
 import { useDataRefresh } from '../hooks/useDataRefresh';
 import { ROUTES } from '../constants';
