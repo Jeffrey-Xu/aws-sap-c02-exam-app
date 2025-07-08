@@ -5,6 +5,8 @@ import Button from '../components/common/Button';
 import { formatTime } from '../utils/questionUtils';
 import { apiService } from '../services/api';
 
+// User deletion functionality added - v1.1
+
 interface UserMetrics {
   userId: string;
   email: string;
