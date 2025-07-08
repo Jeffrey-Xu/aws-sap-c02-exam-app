@@ -11,7 +11,7 @@ import { useUserProgress } from './hooks/useUserProgress';
 import { initializeProgressPersistence, cleanupProgressPersistence } from './utils/progressPersistence';
 
 // Lazy load pages for better performance
-const PracticePage = lazy(() => import('./pages/PracticePageMinimal'));
+const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ExamPage = lazy(() => import('./pages/ExamPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
