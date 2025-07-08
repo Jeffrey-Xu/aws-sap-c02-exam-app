@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '../stores/authStore';
+import { useServerAuthStore } from '../stores/serverAuthStore';
 import { useProgressStore } from '../stores/progressStore';
 
 /**
@@ -8,7 +8,7 @@ import { useProgressStore } from '../stores/progressStore';
  * and when they log out, their progress is saved
  */
 export const useUserProgress = () => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useServerAuthStore();
   const { loadUserProgress, saveUserProgress } = useProgressStore();
 
   useEffect(() => {

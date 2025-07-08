@@ -6,7 +6,7 @@ import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import UserProgressManager from './components/auth/UserProgressManager';
-import { useAuthStore } from './stores/authStore';
+import { useServerAuthStore, checkServerSession } from './stores/serverAuthStore';
 import { useUserProgress } from './hooks/useUserProgress';
 import { initializeProgressPersistence, cleanupProgressPersistence } from './utils/progressPersistence';
 
@@ -26,7 +26,7 @@ const LoadingSpinner: React.FC = () => (
 
 // Root route handler
 const RootRoute: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useServerAuthStore();
   
   useUserProgress(); // Manage user progress for authenticated users
   
@@ -42,7 +42,7 @@ const RootRoute: React.FC = () => {
 };
 
 function App() {
-  const { checkSession } = useAuthStore();
+  const { getCurrentUser } = useServerAuthStore();
 
   useEffect(() => {
     // Set document title
@@ -51,14 +51,14 @@ function App() {
     // Initialize progress persistence system
     initializeProgressPersistence();
     
-    // Check session on app start
-    checkSession();
+    // Check server session on app start
+    checkServerSession();
     
     // Cleanup on unmount
     return () => {
       cleanupProgressPersistence();
     };
-  }, [checkSession]);
+  }, []);
 
   return (
     <Router>

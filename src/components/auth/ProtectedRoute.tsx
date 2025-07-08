@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
+import { useServerAuthStore, checkServerSession } from '../../stores/serverAuthStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, user, checkSession } = useAuthStore();
+  const { isAuthenticated, user, isLoading } = useServerAuthStore();
 
   useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+    checkServerSession();
+  }, []);
 
   // Show loading state while checking authentication
-  if (isAuthenticated === undefined) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aws-orange"></div>
@@ -27,7 +27,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // No email verification check needed - user is authenticated and ready to go
+  // User is authenticated and ready to go
   return <>{children}</>;
 };
 

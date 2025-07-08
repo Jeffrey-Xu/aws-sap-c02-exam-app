@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '../../stores/authStore';
+import { useServerAuthStore } from '../../stores/serverAuthStore';
 import { useProgressStore } from '../../stores/progressStore';
 
 /**
@@ -7,7 +7,7 @@ import { useProgressStore } from '../../stores/progressStore';
  * This component ensures that each user's progress is isolated and properly managed
  */
 const UserProgressManager: React.FC = () => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useServerAuthStore();
   const { loadUserProgress, saveUserProgress } = useProgressStore();
 
   useEffect(() => {
