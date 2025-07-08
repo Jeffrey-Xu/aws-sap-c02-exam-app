@@ -1,6 +1,6 @@
 {
   "name": "aws-sap-c02-exam-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "AWS Solutions Architect Professional (SAP-C02) Exam Preparation Platform with Multi-User Support",
   "private": true,
   "type": "module",
