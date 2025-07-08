@@ -114,20 +114,11 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
           <p className="text-gray-600 mt-2">Join AWS SAP-C02 Exam Prep</p>
           
-          {/* User Count Display */}
+          {/* User Count Display - Server handles this */}
           <div className="mt-4 flex items-center justify-center text-sm text-gray-500">
             <Users className="h-4 w-4 mr-1" />
-            <span>{userCount}/20 users registered</span>
+            <span>Server-side user management</span>
           </div>
-          
-          {!canRegister && (
-            <div className="mt-2 bg-red-50 border border-red-200 rounded-md p-3">
-              <div className="flex items-center justify-center">
-                <AlertCircle className="h-4 w-4 text-red-400 mr-2" />
-                <span className="text-sm text-red-700">Registration limit reached</span>
-              </div>
-            </div>
-          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -150,7 +141,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                     fieldErrors.firstName ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="First name"
-                  disabled={isLoading || !canRegister}
+                  disabled={isLoading}
                 />
               </div>
               {fieldErrors.firstName && (
@@ -171,7 +162,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                   fieldErrors.lastName ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Last name"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               />
               {fieldErrors.lastName && (
                 <div className="mt-1 text-sm text-red-600">{fieldErrors.lastName}</div>
@@ -197,7 +188,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                   fieldErrors.email ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Enter your email"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               />
             </div>
             {emailSuggestion && (
@@ -237,13 +228,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                   fieldErrors.password ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Create a password"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -303,13 +294,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                   fieldErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Confirm your password"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                disabled={isLoading || !canRegister}
+                disabled={isLoading}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -358,7 +349,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading || !canRegister}
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
